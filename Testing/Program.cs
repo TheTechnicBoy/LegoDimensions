@@ -8,18 +8,19 @@ namespace Testing
         public static Portal portal;
         static void Main(string[] args)
         {
-            Test test = new Test();
-            test.test();
-            Console.WriteLine("AFTER Thread.sleep()");
+            _Main();
+            //Test test = new Test();
+            //test.test();
+            //Console.WriteLine("AFTER Thread.sleep()");
         }
 
         public static void _Main()
         {
-            portal = new Portal(true);
+            portal = new Portal(false);
             portal.PortalTagEvent += PortalTagEvent;
 
-            Thread.Sleep(3000);
-            portal.SetFades(new FadeProperties(new Color(10, 0, 0), 100, 255), new FadeProperties(new Color(0, 10, 0), 100, 255), new FadeProperties(new Color(0, 0, 10), 100, 255));
+            //Thread.Sleep(3000);
+            //portal.SetFades(new FadeProperties(new Color(10, 0, 0), 100, 255), new FadeProperties(new Color(0, 10, 0), 100, 255), new FadeProperties(new Color(0, 0, 10), 100, 255));
             Console.ReadLine();
 
             portal.Close();
@@ -54,8 +55,22 @@ namespace Testing
 
             if (args.Placed)
             {
-                byte[] test1 = portal.ReadTag((byte)args.ID, 4);
-                byte[] test2 = portal.ReadTag((byte)args.ID, 5);
+                
+                Console.WriteLine("Reading tag...");
+
+                List<byte[]> data = portal.DumpTag((byte) args.ID);
+
+                foreach (var item in data)
+                {
+                    Console.WriteLine(BitConverter.ToString(item));
+                }
+
+                Thread.Sleep(1000);
+
+                Console.WriteLine("Writing tag...");
+
+                portal.WriteTag((byte)args.ID,  4,  new byte[] { 0x01, 0x03,0xA0, 0x0C });
+
             }
         }
     }
