@@ -16,7 +16,7 @@ namespace Testing
 
         public static void _Main()
         {
-            portal = new Portal(false);
+            portal = new Portal(true);
             portal.PortalTagEvent += PortalTagEvent;
 
             //Thread.Sleep(3000);
@@ -65,11 +65,15 @@ namespace Testing
                     Console.WriteLine(BitConverter.ToString(item));
                 }
 
+                
                 Thread.Sleep(1000);
 
                 Console.WriteLine("Writing tag...");
 
-                portal.WriteTag((byte)args.ID,  4,  new byte[] { 0x01, 0x03,0xA0, 0x0C });
+                Console.WriteLine(portal.WriteTag((byte)args.ID,  16,  new byte[] { 0xFF, 0x11,0xEE, 0x22 }));
+
+                Console.WriteLine(portal.WriteTag((byte)args.ID, 16, new byte[] { 0x00, 0x00, 0x00, 0x00 }));
+
 
             }
         }

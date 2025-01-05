@@ -226,102 +226,6 @@ namespace LegoDimensions
             SendMessage(byte_);
         }
 
-        public byte[] ReadTag(byte index, byte page)
-        {
-            var waitHandle = new ManualResetEvent(false);
-            byte[] result = null;
-
-            byte[] byte_ = new byte[32];
-            var MessageID_ = _messageID++;
-
-            byte_[0] = 0x55; //start
-            byte_[1] = 0x04; //command length
-            byte_[2] = (byte)MessageCommand.Read; //command
-            byte_[3] = MessageID_; //Message ID (i think)
-
-            byte_[4] = index;
-            byte_[5] = page;
-
-            byte_[6] = ComputeAdditionChecksum(byte_);
-
-            _FormatedResponse[MessageID_] = waitHandle;
-
-            SendMessage(byte_);
-
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                result = (byte[])_FormatedResponse[MessageID_];
-                _FormatedResponse.Remove(MessageID_);
-            }
-            else
-            {
-                throw new TimeoutException("Timeout beim Warten auf die Antwort vom Portal.");
-            }
-
-
-            return result;
-        }
-
-        public List<byte[]> DumpTag(byte index)
-        {
-            List<byte[]> result = new List<byte[]>();
-            for (byte i = 0; i < 0x2c; i += 4)
-            {
-                var tag = ReadTag(index, i);
-                if (tag.Length == 0)
-                {
-                    Console.WriteLine($"Error reading card page 0x{i:X2}");
-                    throw new Exception("Error reading card page 0x" + i.ToString("X2"));
-                }
-                else result.Add(tag);
-            }
-            return result;
-        }
-
-        public bool WriteTag(byte index, byte page, byte[] bytes)
-        {
-            if (bytes.Length != 4)
-            {
-                throw new ArgumentException("Write to card must be 4 bytes.");
-            }
-
-            var waitHandle = new ManualResetEvent(false);
-            bool result = false;
-
-            byte[] byte_ = new byte[32];
-            var MessageID_ = _messageID++;
-
-            byte_[0] = 0x55; //start
-            byte_[1] = 0x08; //command length
-            byte_[2] = (byte)MessageCommand.Write; //command
-            byte_[3] = MessageID_; //Message ID (i think)
-
-            byte_[4] = index;
-            byte_[5] = page;
-            byte_[6] = bytes[0];
-            byte_[7] = bytes[1];
-            byte_[8] = bytes[2];
-            byte_[9] = bytes[3];
-
-            byte_[10] = ComputeAdditionChecksum(byte_);
-
-            _FormatedResponse[MessageID_] = waitHandle;
-
-            SendMessage(byte_);
-
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                result = (bool)_FormatedResponse[MessageID_];
-                _FormatedResponse.Remove(MessageID_);
-            }
-            else
-            {
-                throw new TimeoutException("Timeout beim Warten auf die Antwort vom Portal.");
-            }
-
-
-            return result;
-        }
 
         public void SetFlashs(FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
         {
@@ -479,6 +383,105 @@ namespace LegoDimensions
         }
         #endregion
 
+        #region Tag
+        public byte[] ReadTag(byte index, byte page)
+        {
+            var waitHandle = new ManualResetEvent(false);
+            byte[] result = null;
+
+            byte[] byte_ = new byte[32];
+            var MessageID_ = _messageID++;
+
+            byte_[0] = 0x55; //start
+            byte_[1] = 0x04; //command length
+            byte_[2] = (byte)MessageCommand.Read; //command
+            byte_[3] = MessageID_; //Message ID (i think)
+
+            byte_[4] = index;
+            byte_[5] = page;
+
+            byte_[6] = ComputeAdditionChecksum(byte_);
+
+            _FormatedResponse[MessageID_] = waitHandle;
+
+            SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                result = (byte[])_FormatedResponse[MessageID_];
+                _FormatedResponse.Remove(MessageID_);
+            }
+            else
+            {
+                throw new TimeoutException("Timeout beim Warten auf die Antwort vom Portal.");
+            }
+
+
+            return result;
+        }
+
+        public List<byte[]> DumpTag(byte index)
+        {
+            List<byte[]> result = new List<byte[]>();
+            for (byte i = 0; i < 0x2c; i += 4)
+            {
+                var tag = ReadTag(index, i);
+                if (tag.Length == 0)
+                {
+                    Console.WriteLine($"Error reading card page 0x{i:X2}");
+                    throw new Exception("Error reading card page 0x" + i.ToString("X2"));
+                }
+                else result.Add(tag);
+            }
+            return result;
+        }
+
+        public bool WriteTag(byte index, byte page, byte[] bytes)
+        {
+            if (bytes.Length != 4)
+            {
+                throw new ArgumentException("Write to card must be 4 bytes.");
+            }
+
+            var waitHandle = new ManualResetEvent(false);
+            bool result;
+
+            byte[] byte_ = new byte[32];
+            var MessageID_ = _messageID++;
+
+            byte_[0] = 0x55; //start
+            byte_[1] = 0x08; //command length
+            byte_[2] = (byte)MessageCommand.Write; //command
+            byte_[3] = MessageID_; //Message ID (i think)
+
+            byte_[4] = index;
+            byte_[5] = page;
+            byte_[6] = bytes[0];
+            byte_[7] = bytes[1];
+            byte_[8] = bytes[2];
+            byte_[9] = bytes[3];
+
+            byte_[10] = ComputeAdditionChecksum(byte_);
+
+            _FormatedResponse[MessageID_] = waitHandle;
+
+            SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                result = (bool)_FormatedResponse[MessageID_];
+                _FormatedResponse.Remove(MessageID_);
+            }
+            else
+            {
+                throw new TimeoutException("Timeout beim Warten auf die Antwort vom Portal.");
+            }
+
+
+            return result;
+        }
+        #endregion
+
         private void ReadThread(object? obj)
         {
             var readBuffer_ = new byte[32];
@@ -524,6 +527,12 @@ namespace LegoDimensions
                                 _FormatedResponse[ID] = bytes;
                                 waitHandle.Set();
 
+                            }
+                            else if (MessageCommand == MessageCommand.Write)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                _FormatedResponse[ID] = readBuffer_[3] == 0;
+                                waitHandle.Set();
                             }
                             else
                             {
