@@ -1,5 +1,7 @@
 ﻿
 using LegoDimensions;
+using System;
+using System.Net.Http.Headers;
 
 namespace Testing
 {
@@ -7,6 +9,7 @@ namespace Testing
     {
         public static Portal portal;
         static void Main(string[] args)
+            
         {
             _Main();
             //Test test = new Test();
@@ -56,8 +59,10 @@ namespace Testing
             if (args.Placed)
             {
                 
+
                 Console.WriteLine("Reading tag...");
 
+                
                 List<byte[]> data = portal.DumpTag((byte) args.ID);
 
                 foreach (var item in data)
@@ -65,14 +70,33 @@ namespace Testing
                     Console.WriteLine(BitConverter.ToString(item));
                 }
 
-                
-                Thread.Sleep(1000);
+                //Console.WriteLine(BitConverter.ToString(portal.ReadTag(0, 0)));
+
+
+                Console.WriteLine("Setting Pasword");
+                portal.SetTagPassword(PortalPassword.Disable, (byte)args.ID);
+
+                Console.WriteLine("Reading tag...");
+
+
+                List<byte[]> data_ = portal.DumpTag((byte)args.ID);
+
+                foreach (var item in data_)
+                {
+                    Console.WriteLine(BitConverter.ToString(item));
+                }
+
 
                 Console.WriteLine("Writing tag...");
 
-                Console.WriteLine(portal.WriteTag((byte)args.ID,  16,  new byte[] { 0xFF, 0x11,0xEE, 0x22 }));
+                byte[] bytes = portal.ReadTag((byte)args.ID, 16);
+                byte[] newByte = new byte[4];
+                Array.Copy(bytes, 0, newByte, 0, 4);
+                newByte[0]++;
+                Console.WriteLine(portal.WriteTag((byte)args.ID,  16, newByte));
 
-                Console.WriteLine(portal.WriteTag((byte)args.ID, 16, new byte[] { 0x00, 0x00, 0x00, 0x00 }));
+                Console.WriteLine("Now Set To " + newByte[0]);
+                
 
 
             }
