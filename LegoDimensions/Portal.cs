@@ -75,7 +75,7 @@ namespace LegoDimensions
             _readThread.Start();
 
             //Activate
-            WakeUp();
+            if (!WakeUp()) throw new Exception("Could Not Wake up Portal");
 
             //Animation
             if (_startStoppAnimations)
@@ -109,8 +109,11 @@ namespace LegoDimensions
 
 
         #region Ulitiliy
-        internal void WakeUp()
+        internal bool WakeUp()
         {
+            var waitHandle = new ManualResetEvent(false);
+            bool result = false;
+
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -133,7 +136,17 @@ namespace LegoDimensions
             byte_[16] = 0x34;//'4'
             byte_[17] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+            
+            if (waitHandle.WaitOne(ReceiveTimeout + 3000, false))
+            {
+                result = (bool)_FormatedResponse[MessageID_];
+                _FormatedResponse.Remove(MessageID_);
+            }
+
+            return result;
         }
         internal static byte ComputeAdditionChecksum(byte[] data)
         {
@@ -363,7 +376,7 @@ namespace LegoDimensions
 
             SendMessage(byte_);
         }
-        public void FadeRanom(Pad pad, RandomFadeProperties randomFadeProperties)
+        public void FadeRandom(Pad pad, RandomFadeProperties randomFadeProperties)
         {
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
@@ -479,6 +492,39 @@ namespace LegoDimensions
 
 
             return result;
+
+            
+        }
+
+        public void SetTagPassword(PortalPassword password, byte index, byte[] newPassword = null){
+            if (password == PortalPassword.Custom)
+            {
+                if (newPassword != null && newPassword.Length != 4)
+                {
+                    throw new ArgumentException("New password must be 4 bytes");
+                }
+            }
+
+            if(newPassword == null) newPassword = new byte[4];
+
+            byte[] byte_ = new byte[32];
+            var MessageID_ = _messageID++;
+
+            byte_[0] = 0x55; //start
+            byte_[1] = 0x08; //command length
+            byte_[2] = (byte)MessageCommand.ConfigPassword; //command
+            byte_[3] = MessageID_; //Message ID (i think)
+
+            byte_[4] = (byte)password;
+            byte_[5] = index;
+            byte_[6] = newPassword[0];
+            byte_[7] = newPassword[1];
+            byte_[8] = newPassword[2];
+            byte_[9] = newPassword[3];
+
+            byte_[10] = ComputeAdditionChecksum(byte_);
+
+            SendMessage(byte_);
         }
         #endregion
 
@@ -513,15 +559,19 @@ namespace LegoDimensions
                                 Console.ForegroundColor = ConsoleColor.White;
                             }
 
-                            var ID = (int)readBuffer_[2];
-                            var Length = (int)readBuffer_[1] + 2;
+                            
+                            var Length = (int)readBuffer_[1];
+                            
+                            byte[] payload = new byte[Length];
+                            Array.Copy(readBuffer_, 2, payload, 0, Length);
+
+                            var ID = (int)payload[0];
                             var MessageCommand = (MessageCommand)_CommandDictionary[ID];
                             _CommandDictionary.Remove(ID);
 
                             if (MessageCommand == MessageCommand.Read)
                             {
-                                byte[] bytes = new byte[16];
-                                Array.Copy(readBuffer_, 4, bytes, 0, Length - 4);
+                                byte[] bytes = payload[2..];
 
                                 var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
                                 _FormatedResponse[ID] = bytes;
@@ -531,7 +581,14 @@ namespace LegoDimensions
                             else if (MessageCommand == MessageCommand.Write)
                             {
                                 var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
-                                _FormatedResponse[ID] = readBuffer_[3] == 0;
+                                bool success = payload[1] == 0;
+                                _FormatedResponse[ID] = success;
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.Wake)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                _FormatedResponse[ID] = true;
                                 waitHandle.Set();
                             }
                             else

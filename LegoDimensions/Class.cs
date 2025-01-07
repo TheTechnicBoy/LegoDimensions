@@ -159,4 +159,25 @@ namespace LegoDimensions
 
         public byte[] UUID { get; internal set; }
     }
+
+    /// <summary>
+    /// The password type for the portal NFC card authentication.
+    /// </summary>
+    public enum PortalPassword
+    {
+        /// <summary>
+        /// Disabled.
+        /// </summary>
+        Disable = 0,
+
+        /// <summary>
+        /// Automatic, this is the default.
+        /// </summary>
+        Automatic = 1,
+
+        /// <summary>
+        /// Custom password.
+        /// </summary>
+        Custom = 2,
+    }
 }
