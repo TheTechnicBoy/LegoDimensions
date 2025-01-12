@@ -11,6 +11,7 @@ namespace Testing
         static void Main(string[] args)
             
         {
+            
             _Main();
             //Test test = new Test();
             //test.test();
@@ -31,74 +32,65 @@ namespace Testing
 
         private static void PortalTagEvent(PortalTagEventArgs args)
         {
-            Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("\r");
-            Console.Write(DateTime.Now.ToString("HH:mm:ss"));
-            Console.Write(" - ");
-
-            Console.Write("[");
-            if (args.Placed)
+            try
             {
-                Console.ForegroundColor = ConsoleColor.Green;
-                Console.Write("+");
                 Console.ForegroundColor = ConsoleColor.White;
-            }
-            else
-            {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.Write("-");
-                Console.ForegroundColor = ConsoleColor.White;
-            }
-            Console.Write("]");
+                Console.Write("\r");
+                Console.Write(DateTime.Now.ToString("HH:mm:ss"));
+                Console.Write(" - ");
 
-            Console.Write(" - ");
-            Console.Write(args.Pad.ToString());
-            Console.Write(" - ");
-            Console.WriteLine(BitConverter.ToString(args.UUID));
-
-            if (args.Placed)
-            {
-                
-
-                Console.WriteLine("Reading tag...");
-
-                
-                List<byte[]> data = portal.DumpTag((byte) args.ID);
-
-                foreach (var item in data)
+                Console.Write("[");
+                if (args.Placed)
                 {
-                    Console.WriteLine(BitConverter.ToString(item));
+                    Console.ForegroundColor = ConsoleColor.Green;
+                    Console.Write("+");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
-
-                //Console.WriteLine(BitConverter.ToString(portal.ReadTag(0, 0)));
-
-
-                Console.WriteLine("Setting Pasword");
-                portal.SetTagPassword(PortalPassword.Disable, (byte)args.ID);
-
-                Console.WriteLine("Reading tag...");
-
-
-                List<byte[]> data_ = portal.DumpTag((byte)args.ID);
-
-                foreach (var item in data_)
+                else
                 {
-                    Console.WriteLine(BitConverter.ToString(item));
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.Write("-");
+                    Console.ForegroundColor = ConsoleColor.White;
                 }
+                Console.Write("]");
+
+                Console.Write(" - ");
+                Console.Write(args.Pad.ToString());
+                Console.Write(" - ");
+                Console.WriteLine(BitConverter.ToString(args.UUID));
+
+                if (args.Placed)
+                {
+                    Console.WriteLine("Setting Pasword: ");
+                    portal.SetTagPassword(PortalPassword.Disable, 0);
 
 
-                Console.WriteLine("Writing tag...");
+                    Console.WriteLine("Reading tag...");
+                    List<byte[]> data_ = portal.DumpTag((byte)args.ID);
 
-                byte[] bytes = portal.ReadTag((byte)args.ID, 16);
-                byte[] newByte = new byte[4];
-                Array.Copy(bytes, 0, newByte, 0, 4);
-                newByte[0]++;
-                Console.WriteLine(portal.WriteTag((byte)args.ID,  16, newByte));
-
-                Console.WriteLine("Now Set To " + newByte[0]);
-                
+                    foreach (var item in data_)
+                    {
+                        Console.WriteLine(BitConverter.ToString(item));
+                    }
 
 
+                    Console.WriteLine("Writing tag...");
+
+                    byte[] bytes = portal.ReadTag((byte)args.ID, 16);
+                    byte[] newByte = new byte[4];
+                    Array.Copy(bytes, 0, newByte, 0, 4);
+                    newByte[0]++;
+                    Console.WriteLine(portal.WriteTag((byte)args.ID, 16, newByte));
+
+                    Console.WriteLine("Now Set To " + newByte[0]);
+
+
+
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
         }
     }
