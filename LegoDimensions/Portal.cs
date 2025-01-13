@@ -2,6 +2,7 @@
 using LibUsbDotNet.Main;
 using System.ComponentModel;
 using System.Reflection;
+using System.Threading;
 
 namespace LegoDimensions
 {
@@ -399,7 +400,7 @@ namespace LegoDimensions
         #endregion
 
         #region Tag
-        public byte[] ReadTag(byte index, byte page)
+        public byte[] ReadTag(byte index, byte page, out bool timeout)
         {
             if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             var waitHandle = new ManualResetEvent(false);
@@ -426,23 +427,37 @@ namespace LegoDimensions
             {
                 result = (byte[])_FormatedResponse[MessageID_];
                 _FormatedResponse.Remove(MessageID_);
+                timeout = false;
             }
             else
             {
-                throw new TimeoutException("Timeout beim Warten auf die Antwort vom Portal.");
+                timeout = true;
             }
 
 
             return result;
         }
+        public byte[] ReadTag(byte index, byte page)
+        {
+            return ReadTag(index, page, out _);
+        }
 
-        public List<byte[]> DumpTag(byte index)
+        public List<byte[]> DumpTag(byte index, out bool timeout)
         {
             if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             List<byte[]> result = new List<byte[]>();
+            timeout = false;
+
             for (byte i = 0; i < 0x2c; i += 4)
             {
-                var tag = ReadTag(index, i);
+                bool _timeout;
+                var tag = ReadTag(index, i, out _timeout);
+                if (_timeout)
+                {
+                    timeout = true;
+                    break;
+                }
+                    
                 if (tag.Length == 0)
                 {
                     Console.WriteLine($"Error reading card page 0x{i:X2}");
@@ -452,8 +467,12 @@ namespace LegoDimensions
             }
             return result;
         }
+        public List<byte[]> DumpTag(byte index)
+        {
+            return DumpTag(index, out _);
+        }
 
-        public bool WriteTag(byte index, byte page, byte[] bytes)
+        public bool WriteTag(byte index, byte page, byte[] bytes, out bool timeout)
         {
             if(!presentTags.ContainsKey(index))  throw new Exception("Tag not present on the portal.");
             if (bytes.Length != 4)
@@ -489,16 +508,20 @@ namespace LegoDimensions
             {
                 result = (bool)_FormatedResponse[MessageID_];
                 _FormatedResponse.Remove(MessageID_);
+                timeout = false;
             }
             else
             {
-                throw new TimeoutException("Timeout beim Warten auf die Antwort vom Portal.");
+                timeout = true;
+                result = false;
             }
-
 
             return result;
 
-            
+        }
+        public bool WriteTag(byte index, byte page, byte[] bytes)
+        {
+            return WriteTag(index, page, bytes, out _);
         }
 
         public void SetTagPassword(PortalPassword password, byte index, byte[] newPassword = null){

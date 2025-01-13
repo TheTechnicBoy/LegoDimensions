@@ -58,7 +58,9 @@ namespace Testing
 
 
                     Console.WriteLine("Reading tag...");
-                    List<byte[]> data_ = portal.DumpTag((byte)args.ID);
+                    bool timeout;
+                    List<byte[]> data_ = portal.DumpTag((byte)args.ID, out timeout);
+                    Console.WriteLine("Timeout: " + timeout);
 
                     foreach (var item in data_)
                     {
