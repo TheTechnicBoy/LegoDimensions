@@ -26,6 +26,7 @@ namespace LegoDimensions
         internal byte _messageID;
         internal Dictionary<int, MessageCommand> _CommandDictionary;
         internal Dictionary<int, object> _FormatedResponse;
+        public Dictionary<int, byte[]> presentTags;
 
         //Event
         public Action<PortalTagEventArgs> PortalTagEvent;
@@ -35,6 +36,7 @@ namespace LegoDimensions
         {
             _CommandDictionary = new Dictionary<int, MessageCommand>();
             _FormatedResponse = new Dictionary<int, object>();
+            presentTags = new Dictionary<int, byte[]>();
             _messageID = 0;
             _startStoppAnimations = StartStoppAnimations;
 
@@ -399,6 +401,7 @@ namespace LegoDimensions
         #region Tag
         public byte[] ReadTag(byte index, byte page)
         {
+            if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             var waitHandle = new ManualResetEvent(false);
             byte[] result = null;
 
@@ -435,6 +438,7 @@ namespace LegoDimensions
 
         public List<byte[]> DumpTag(byte index)
         {
+            if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             List<byte[]> result = new List<byte[]>();
             for (byte i = 0; i < 0x2c; i += 4)
             {
@@ -451,6 +455,7 @@ namespace LegoDimensions
 
         public bool WriteTag(byte index, byte page, byte[] bytes)
         {
+            if(!presentTags.ContainsKey(index))  throw new Exception("Tag not present on the portal.");
             if (bytes.Length != 4)
             {
                 throw new ArgumentException("Write to card must be 4 bytes.");
@@ -621,7 +626,11 @@ namespace LegoDimensions
                                 byte[] uuid = new byte[7];
                                 Array.Copy(readBuffer_, 6, uuid, 0, uuid.Length);
 
-                                Task.Run(() => PortalTagEvent?.Invoke(new PortalTagEventArgs() { Pad = Pad, ID = ID, Placed = Placed, UUID = uuid }));
+                                Task.Run(() => {
+                                    if(Placed) presentTags[ID] = uuid;
+                                    else presentTags.Remove(ID);
+                                    PortalTagEvent?.Invoke(new PortalTagEventArgs() { Pad = Pad, ID = ID, Placed = Placed, UUID = uuid });
+                                });
                             }
                         }
 
