@@ -8,18 +8,10 @@ namespace Testing
     internal class Program
     {
         public static Portal portal;
+        
         static void Main(string[] args)
-            
         {
-            
-            _Main();
-            //Test test = new Test();
-            //test.test();
-            //Console.WriteLine("AFTER Thread.sleep()");
-        }
-
-        public static void _Main()
-        {
+        
             portal = new Portal(true);
             portal.PortalTagEvent += PortalTagEvent;
 
@@ -92,6 +84,9 @@ namespace Testing
             {
                 Console.WriteLine(e);
             }
+            
+
+            Console.WriteLine(portal.presentTags.Count);
         }
     }
 }
