@@ -142,7 +142,7 @@ namespace LegoDimensions
             _FormatedResponse[MessageID_] = waitHandle;
 
             SendMessage(byte_);
-            
+
             if (waitHandle.WaitOne(ReceiveTimeout + 3000, false))
             {
                 result = (bool)_FormatedResponse[MessageID_];
@@ -238,7 +238,7 @@ namespace LegoDimensions
         {
             SetColors(out _, center, left, right);
         }
-        
+
         public void SetColor(out bool timeout, Pad pad, Color color)
         {
             var waitHandle = new ManualResetEvent(false);
@@ -325,7 +325,7 @@ namespace LegoDimensions
             }
 
             byte_[25] = ComputeAdditionChecksum(byte_);
-            
+
             _FormatedResponse[MessageID_] = waitHandle;
 
             SendMessage(byte_);
@@ -534,7 +534,7 @@ namespace LegoDimensions
         {
             if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             var waitHandle = new ManualResetEvent(false);
-            byte[] result = {0x00};
+            byte[] result = { 0x00 };
 
             byte[] byte_ = new byte[32];
             var MessageID_ = _messageID++;
@@ -556,6 +556,9 @@ namespace LegoDimensions
             if (waitHandle.WaitOne(ReceiveTimeout, false))
             {
                 result = (byte[])_FormatedResponse[MessageID_];
+                byte[] resultFormat = new byte[4];
+                Array.Copy(result, 0, resultFormat, 0, 4);
+                result = resultFormat;
                 _FormatedResponse.Remove(MessageID_);
                 timeout = false;
             }
@@ -563,7 +566,6 @@ namespace LegoDimensions
             {
                 timeout = true;
             }
-
 
             return result;
         }
@@ -587,7 +589,7 @@ namespace LegoDimensions
                     timeout = true;
                     break;
                 }
-                    
+
                 if (tag == null || tag.Length == 0)
                 {
                     Console.WriteLine($"Error reading card page 0x{i:X2}");
@@ -604,7 +606,7 @@ namespace LegoDimensions
 
         public bool WriteTag(out bool timeout, byte index, byte page, byte[] bytes)
         {
-            if(!presentTags.ContainsKey(index))  throw new Exception("Tag not present on the portal.");
+            if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             if (bytes.Length != 4)
             {
                 throw new ArgumentException("Write to card must be 4 bytes.");
@@ -664,7 +666,7 @@ namespace LegoDimensions
                 }
             }
 
-            if(newPassword == null) newPassword = new byte[4];
+            if (newPassword == null) newPassword = new byte[4];
 
             var waitHandle = new ManualResetEvent(false);
 
@@ -711,7 +713,7 @@ namespace LegoDimensions
             var readBuffer_ = new byte[32];
             int bytesRead_;
 
-           
+
             while (!_cancelThread.IsCancellationRequested)
             {
                 try
@@ -719,7 +721,7 @@ namespace LegoDimensions
                     _endpointReader.Read(readBuffer_, ReadWriteTimeout, out bytesRead_);
 
                     if (bytesRead_ <= 0)
-                    {                        
+                    {
                         continue;
                     }
 
@@ -737,9 +739,9 @@ namespace LegoDimensions
                                 Console.ForegroundColor = ConsoleColor.White;
                             }
 
-                            
+
                             var Length = (int)readBuffer_[1];
-                            
+
                             byte[] payload = new byte[Length];
                             Array.Copy(readBuffer_, 2, payload, 0, Length);
 
@@ -799,8 +801,9 @@ namespace LegoDimensions
                                 byte[] uuid = new byte[7];
                                 Array.Copy(readBuffer_, 6, uuid, 0, uuid.Length);
 
-                                Task.Run(() => {
-                                    if(Placed) presentTags[ID] = uuid;
+                                Task.Run(() =>
+                                {
+                                    if (Placed) presentTags[ID] = uuid;
                                     else presentTags.Remove(ID);
                                     PortalTagEvent?.Invoke(new PortalTagEventArgs() { Pad = Pad, ID = ID, Placed = Placed, UUID = uuid });
                                 });
