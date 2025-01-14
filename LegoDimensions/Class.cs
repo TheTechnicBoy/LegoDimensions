@@ -24,7 +24,9 @@ namespace LegoDimensions
             OffLen = offLen;
             PulseCnt = pulseCnt;
         }
-        public FlashProperties() { }
+        public FlashProperties() {
+            Color = new Color(0, 0, 0);
+         }
 
     }
 
@@ -40,7 +42,9 @@ namespace LegoDimensions
             FadeLen = fadeLen;
             PulseCnt = pulseCnt;
         }
-        public FadeProperties() { }
+        public FadeProperties() { 
+            Color = new Color(0, 0, 0);
+        }
     }
 
     public class RandomFadeProperties
@@ -157,7 +161,7 @@ namespace LegoDimensions
         /// </summary>
         public int ID { get; internal set; }
 
-        public byte[] UUID { get; internal set; }
+        public byte[] UUID { get; internal set; } = {0x00};
     }
 
     /// <summary>

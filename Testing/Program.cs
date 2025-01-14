@@ -7,12 +7,11 @@ namespace Testing
 {
     internal class Program
     {
-        public static Portal portal;
+        public static Portal portal = new Portal(true);
         
         static void Main(string[] args)
         {
-        
-            portal = new Portal(true);
+            if(portal == null) return;
             portal.PortalTagEvent += PortalTagEvent;
 
             //Thread.Sleep(3000);
@@ -59,7 +58,7 @@ namespace Testing
 
                     Console.WriteLine("Reading tag...");
                     bool timeout;
-                    List<byte[]> data_ = portal.DumpTag((byte)args.ID, out timeout);
+                    List<byte[]> data_ = portal.DumpTag(out timeout, (byte)args.ID);
                     Console.WriteLine("Timeout: " + timeout);
 
                     foreach (var item in data_)

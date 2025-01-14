@@ -30,7 +30,7 @@ namespace LegoDimensions
         public Dictionary<int, byte[]> presentTags;
 
         //Event
-        public Action<PortalTagEventArgs> PortalTagEvent;
+        public Action<PortalTagEventArgs> PortalTagEvent = (args) => { };
 
         #region Start/Stop
         public Portal(bool StartStoppAnimations = true, IUsbDevice? usbDevice = null)
@@ -182,8 +182,10 @@ namespace LegoDimensions
 
 
         #region Colors
-        public void SetColors(Color? center = null, Color? left = null, Color? right = null)
+        public void SetColors(out bool timeout, Color? center = null, Color? left = null, Color? right = null)
         {
+            var waitHandle = new ManualResetEvent(false);
+
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -218,10 +220,29 @@ namespace LegoDimensions
 
             byte_[16] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
         }
-        public void SetColor(Pad pad, Color color)
+        public void SetColors(Color? center = null, Color? left = null, Color? right = null)
         {
+            SetColors(out _, center, left, right);
+        }
+        
+        public void SetColor(out bool timeout, Pad pad, Color color)
+        {
+            var waitHandle = new ManualResetEvent(false);
+
             if (color == null) throw new ArgumentNullException(nameof(color));
 
             var MessageID_ = _messageID++;
@@ -239,12 +260,29 @@ namespace LegoDimensions
 
             byte_[8] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
+        }
+        public void SetColor(Pad pad, Color color)
+        {
+            SetColor(out _, pad, color);
         }
 
-
-        public void SetFlashs(FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
+        public void SetFlashs(out bool timeout, FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
         {
+            var waitHandle = new ManualResetEvent(false);
+
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -287,11 +325,30 @@ namespace LegoDimensions
             }
 
             byte_[25] = ComputeAdditionChecksum(byte_);
+            
+            _FormatedResponse[MessageID_] = waitHandle;
 
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
         }
-        public void SetFlash(Pad pad, FlashProperties flashProperties)
+        public void SetFlashs(FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
         {
+            SetFlashs(out _, center, left, right);
+        }
+
+        public void SetFlash(out bool timeout, Pad pad, FlashProperties flashProperties)
+        {
+            var waitHandle = new ManualResetEvent(false);
+
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -310,12 +367,30 @@ namespace LegoDimensions
 
             byte_[11] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
+        }
+        public void SetFlash(Pad pad, FlashProperties flashProperties)
+        {
+            SetFlash(out _, pad, flashProperties);
         }
 
 
-        public void SetFades(FadeProperties? center = null, FadeProperties? left = null, FadeProperties? right = null)
+        public void SetFades(out bool timeout, FadeProperties? center = null, FadeProperties? left = null, FadeProperties? right = null)
         {
+            var waitHandle = new ManualResetEvent(false);
+
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -356,10 +431,30 @@ namespace LegoDimensions
 
             byte_[22] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
         }
-        public void SetFade(Pad pad, FadeProperties fadeProperties)
+
+        public void SetFades(FadeProperties? center = null, FadeProperties? left = null, FadeProperties? right = null)
         {
+            SetFades(out _, center, left, right);
+        }
+
+        public void SetFade(out bool timeout, Pad pad, FadeProperties fadeProperties)
+        {
+            var waitHandle = new ManualResetEvent(false);
+
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -377,10 +472,29 @@ namespace LegoDimensions
 
             byte_[10] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
         }
-        public void FadeRandom(Pad pad, RandomFadeProperties randomFadeProperties)
+        public void SetFade(Pad pad, FadeProperties fadeProperties)
         {
+            SetFade(out _, pad, fadeProperties);
+        }
+
+        public void FadeRandom(out bool timeout, Pad pad, RandomFadeProperties randomFadeProperties)
+        {
+            var waitHandle = new ManualResetEvent(false);
+
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -395,16 +509,32 @@ namespace LegoDimensions
 
             byte_[7] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
+        }
+        public void FadeRandom(Pad pad, RandomFadeProperties randomFadeProperties)
+        {
+            FadeRandom(out _, pad, randomFadeProperties);
         }
         #endregion
 
         #region Tag
-        public byte[] ReadTag(byte index, byte page, out bool timeout)
+        public byte[] ReadTag(out bool timeout, byte index, byte page)
         {
             if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             var waitHandle = new ManualResetEvent(false);
-            byte[] result = null;
+            byte[] result = {0x00};
 
             byte[] byte_ = new byte[32];
             var MessageID_ = _messageID++;
@@ -439,10 +569,10 @@ namespace LegoDimensions
         }
         public byte[] ReadTag(byte index, byte page)
         {
-            return ReadTag(index, page, out _);
+            return ReadTag(out _, index, page);
         }
 
-        public List<byte[]> DumpTag(byte index, out bool timeout)
+        public List<byte[]> DumpTag(out bool timeout, byte index)
         {
             if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             List<byte[]> result = new List<byte[]>();
@@ -451,14 +581,14 @@ namespace LegoDimensions
             for (byte i = 0; i < 0x2c; i += 4)
             {
                 bool _timeout;
-                var tag = ReadTag(index, i, out _timeout);
+                var tag = ReadTag(out _timeout, index, i);
                 if (_timeout)
                 {
                     timeout = true;
                     break;
                 }
                     
-                if (tag.Length == 0)
+                if (tag == null || tag.Length == 0)
                 {
                     Console.WriteLine($"Error reading card page 0x{i:X2}");
                     throw new Exception("Error reading card page 0x" + i.ToString("X2"));
@@ -469,10 +599,10 @@ namespace LegoDimensions
         }
         public List<byte[]> DumpTag(byte index)
         {
-            return DumpTag(index, out _);
+            return DumpTag(out _, index);
         }
 
-        public bool WriteTag(byte index, byte page, byte[] bytes, out bool timeout)
+        public bool WriteTag(out bool timeout, byte index, byte page, byte[] bytes)
         {
             if(!presentTags.ContainsKey(index))  throw new Exception("Tag not present on the portal.");
             if (bytes.Length != 4)
@@ -521,10 +651,11 @@ namespace LegoDimensions
         }
         public bool WriteTag(byte index, byte page, byte[] bytes)
         {
-            return WriteTag(index, page, bytes, out _);
+            return WriteTag(out _, index, page, bytes);
         }
 
-        public void SetTagPassword(PortalPassword password, byte index, byte[] newPassword = null){
+        public void SetTagPassword(out bool timeout, PortalPassword password, byte index, byte[]? newPassword = null)
+        {
             if (password == PortalPassword.Custom)
             {
                 if (newPassword != null && newPassword.Length != 4)
@@ -534,6 +665,8 @@ namespace LegoDimensions
             }
 
             if(newPassword == null) newPassword = new byte[4];
+
+            var waitHandle = new ManualResetEvent(false);
 
             byte[] byte_ = new byte[32];
             var MessageID_ = _messageID++;
@@ -552,7 +685,24 @@ namespace LegoDimensions
 
             byte_[10] = ComputeAdditionChecksum(byte_);
 
+            _FormatedResponse[MessageID_] = waitHandle;
+
             SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
+        }
+
+        public void SetTagPassword(PortalPassword password, byte index, byte[]? newPassword = null)
+        {
+            SetTagPassword(out _, password, index, newPassword);
         }
         #endregion
 
