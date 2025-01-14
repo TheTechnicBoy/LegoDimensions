@@ -143,7 +143,7 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout + 3000, false))
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
             {
                 result = (bool)_FormatedResponse[MessageID_];
                 _FormatedResponse.Remove(MessageID_);
