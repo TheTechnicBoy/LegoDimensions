@@ -1,7 +1,9 @@
 ﻿using LibUsbDotNet.LibUsb;
 using LibUsbDotNet.Main;
 using System.ComponentModel;
+using System.Diagnostics.Tracing;
 using System.Reflection;
+using System.Security.AccessControl;
 using System.Threading;
 
 namespace LegoDimensions
@@ -145,8 +147,8 @@ namespace LegoDimensions
 
             if (waitHandle.WaitOne(ReceiveTimeout, false))
             {
-                result = (bool)_FormatedResponse[MessageID_];
                 _FormatedResponse.Remove(MessageID_);
+                result = true;
             }
 
             return result;
@@ -530,7 +532,16 @@ namespace LegoDimensions
         #endregion
 
         #region Tag
+
         public byte[] ReadTag(out bool timeout, byte index, byte page)
+        {
+            var result = _ReadTag(out timeout, index, page);
+            byte[] resultFormat = new byte[4];
+            Array.Copy(result, 0, resultFormat, 0, 4);
+            result = resultFormat;
+            return result;
+        }
+        private byte[] _ReadTag(out bool timeout, byte index, byte page)
         {
             if (!presentTags.ContainsKey(index)) throw new Exception("Tag not present on the portal.");
             var waitHandle = new ManualResetEvent(false);
@@ -556,9 +567,7 @@ namespace LegoDimensions
             if (waitHandle.WaitOne(ReceiveTimeout, false))
             {
                 result = (byte[])_FormatedResponse[MessageID_];
-                byte[] resultFormat = new byte[4];
-                Array.Copy(result, 0, resultFormat, 0, 4);
-                result = resultFormat;
+
                 _FormatedResponse.Remove(MessageID_);
                 timeout = false;
             }
@@ -583,7 +592,7 @@ namespace LegoDimensions
             for (byte i = 0; i < 0x2c; i += 4)
             {
                 bool _timeout;
-                var tag = ReadTag(out _timeout, index, i);
+                var tag = _ReadTag(out _timeout, index, i);
                 if (_timeout)
                 {
                     timeout = true;
@@ -701,7 +710,6 @@ namespace LegoDimensions
                 timeout = true;
             }
         }
-
         public void SetTagPassword(PortalPassword password, byte index, byte[]? newPassword = null)
         {
             SetTagPassword(out _, password, index, newPassword);
@@ -734,9 +742,10 @@ namespace LegoDimensions
                         {
                             if (_Debug)
                             {
+                                ConsoleColor before = Console.ForegroundColor;
                                 Console.ForegroundColor = ConsoleColor.Red;
-                                Console.WriteLine(hex);
-                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.WriteLine("[Commands] " + hex);
+                                Console.ForegroundColor = before;
                             }
 
 
@@ -748,6 +757,10 @@ namespace LegoDimensions
                             var ID = (int)payload[0];
                             var MessageCommand = (MessageCommand)_CommandDictionary[ID];
                             _CommandDictionary.Remove(ID);
+
+                            //Payload 0 is the CommandID send by incrementing _messageID
+                            //Payload 1 is the status of the command
+                            //Payload 2 and up is the data
 
                             if (MessageCommand == MessageCommand.Read)
                             {
@@ -768,12 +781,55 @@ namespace LegoDimensions
                             else if (MessageCommand == MessageCommand.Wake)
                             {
                                 var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
-                                _FormatedResponse[ID] = true;
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.ConfigPassword)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.Fade)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.FadeAll)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.Flash)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.FlashAll)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.Color)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if (MessageCommand == MessageCommand.ColorAll)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if(MessageCommand == MessageCommand.FadeRandom)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
                                 waitHandle.Set();
                             }
                             else
                             {
-                                Console.WriteLine(MessageCommand.ToString() + "   -   " + hex);
+                                ConsoleColor before = Console.ForegroundColor;
+                                Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                                Console.WriteLine("WIP Commands: " + MessageCommand.ToString() + "   -   " + hex);
+                                Console.WriteLine("Payload: " + BitConverter.ToString(payload));
+                                Console.ForegroundColor = before;
                             }
 
                         }
@@ -783,9 +839,10 @@ namespace LegoDimensions
                         {
                             if (_Debug)
                             {
+                                ConsoleColor before = Console.ForegroundColor;
                                 Console.ForegroundColor = ConsoleColor.Green;
-                                Console.WriteLine(hex);
-                                Console.ForegroundColor = ConsoleColor.White;
+                                Console.WriteLine("[Events] " + hex);
+                                Console.ForegroundColor = before;
                             }
 
                             //I guess Tag/Chip Event
@@ -812,13 +869,19 @@ namespace LegoDimensions
 
                         else
                         {
-                            throw new NotImplementedException(hex);
+                            ConsoleColor before = Console.ForegroundColor;
+                            Console.ForegroundColor = ConsoleColor.DarkMagenta;
+                            Console.WriteLine("WIP Events: " + hex);
+                            Console.ForegroundColor = before;
                         }
                     }
                 }
                 catch
                 {
-
+                    ConsoleColor before = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.WriteLine("An Error Occured in the Read Thread.");
+                    Console.ForegroundColor = before;
                 }
             }
         }

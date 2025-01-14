@@ -68,19 +68,11 @@ namespace Testing
                 Console.WriteLine("Writing tag...");
 
                 byte[] bytes = portal.ReadTag((byte)args.ID, 16);
-                byte[] newByte = new byte[4];
-                Array.Copy(bytes, 0, newByte, 0, 4);
-                newByte[0]++;
-                Console.WriteLine(portal.WriteTag((byte)args.ID, 16, newByte));
+                bytes[0]++;
+                Console.WriteLine(portal.WriteTag((byte)args.ID, 16, bytes));
 
-                Console.WriteLine("Now Set To " + newByte[0]);
-
-
-
+                Console.WriteLine("Now Set To " + bytes[0]);
             }
-
-
-
             Console.WriteLine(portal.presentTags.Count);
         }
     }
