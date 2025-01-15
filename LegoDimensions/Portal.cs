@@ -714,6 +714,41 @@ namespace LegoDimensions
         {
             SetTagPassword(out _, password, index, newPassword);
         }
+
+        public void setNFCEnabled(out bool timeout, bool enabled){
+            //Only a Payload from 1 -> true/false
+
+            var waitHandle = new ManualResetEvent(false);
+
+             byte[] byte_ = new byte[32];
+            var MessageID_ = _messageID++;
+
+            byte_[0] = 0x55; //start
+            byte_[1] = 0x03; //command length
+            byte_[2] = (byte)MessageCommand.ConfigActive; //command
+            byte_[3] = MessageID_; //Message ID (i think)
+
+            byte_[4] = (byte)(enabled ? 1 : 0);
+
+            byte_[5] = ComputeAdditionChecksum(byte_);
+
+            _FormatedResponse[MessageID_] = waitHandle;
+
+            SendMessage(byte_);
+
+            if (waitHandle.WaitOne(ReceiveTimeout, false))
+            {
+                _FormatedResponse.Remove(MessageID_);
+                timeout = false;
+            }
+            else
+            {
+                timeout = true;
+            }
+        }
+        public void setNFCEnabled(bool enabled){
+            setNFCEnabled(out _, enabled);
+        }
         #endregion
 
         private void ReadThread(object? obj)
@@ -819,6 +854,11 @@ namespace LegoDimensions
                                 waitHandle.Set();
                             }
                             else if(MessageCommand == MessageCommand.FadeRandom)
+                            {
+                                var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
+                                waitHandle.Set();
+                            }
+                            else if(MessageCommand == MessageCommand.ConfigActive)
                             {
                                 var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
                                 waitHandle.Set();

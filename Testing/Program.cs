@@ -13,6 +13,7 @@ namespace Testing
         {
             if (portal == null) return;
             portal.PortalTagEvent += PortalTagEvent;
+            portal.setNFCEnabled(false);
 
             //Thread.Sleep(3000);
             //portal.SetFades(new FadeProperties(new Color(10, 0, 0), 100, 255), new FadeProperties(new Color(0, 10, 0), 100, 255), new FadeProperties(new Color(0, 0, 10), 100, 255));
