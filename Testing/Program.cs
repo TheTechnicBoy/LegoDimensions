@@ -13,8 +13,9 @@ namespace Testing
         {
             if (portal == null) return;
             portal.PortalTagEvent += PortalTagEvent;
-            portal.setNFCEnabled(false);
-
+            portal.nfcEnabled = true;
+            Thread.Sleep(3000);
+            portal.SetFlash(Pad.All, new FlashProperties(new Color(255, 255, 255), 20, 20, 255));
             //Thread.Sleep(3000);
             //portal.SetFades(new FadeProperties(new Color(10, 0, 0), 100, 255), new FadeProperties(new Color(0, 10, 0), 100, 255), new FadeProperties(new Color(0, 0, 10), 100, 255));
             Console.ReadLine();

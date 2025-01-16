@@ -30,6 +30,23 @@ namespace LegoDimensions
         internal Dictionary<int, MessageCommand> _CommandDictionary;
         internal Dictionary<int, object> _FormatedResponse;
         public Dictionary<int, byte[]> presentTags;
+        private bool _nfcEnabled = true;
+        public bool nfcEnabled {
+            get => _nfcEnabled;
+            set
+            {
+                if(value == _nfcEnabled) return;
+                bool timeout;
+                setNFCEnabled(out timeout, value);
+                if(timeout) {
+                    ConsoleColor before = Console.ForegroundColor;
+                    Console.ForegroundColor = ConsoleColor.DarkRed;
+                    Console.WriteLine("Timeout while setting NFCEnabled");
+                    Console.ForegroundColor = before;
+                }
+                if(!timeout) _nfcEnabled = value;
+            }
+        }
 
         //Event
         public Action<PortalTagEventArgs> PortalTagEvent = (args) => { };
@@ -715,7 +732,7 @@ namespace LegoDimensions
             SetTagPassword(out _, password, index, newPassword);
         }
 
-        public void setNFCEnabled(out bool timeout, bool enabled){
+        private void setNFCEnabled(out bool timeout, bool enabled){
             //Only a Payload from 1 -> true/false
 
             var waitHandle = new ManualResetEvent(false);
@@ -745,9 +762,6 @@ namespace LegoDimensions
             {
                 timeout = true;
             }
-        }
-        public void setNFCEnabled(bool enabled){
-            setNFCEnabled(out _, enabled);
         }
         #endregion
 
