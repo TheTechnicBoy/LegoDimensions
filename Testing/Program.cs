@@ -15,7 +15,9 @@ namespace Testing
             portal.PortalTagEvent += PortalTagEvent;
             portal.nfcEnabled = true;
             Thread.Sleep(3000);
-            portal.SetFlash(Pad.All, new FlashProperties(new Color(255, 255, 255), 20, 20, 255));
+            portal.SetColor(Pad.Right, new Color(214, 108, 2));
+            portal.SetColor(Pad.Left, new Color(2, 136, 214));
+            portal.SetColor(Pad.Center, new Color(0,0,0));
             //Thread.Sleep(3000);
             //portal.SetFades(new FadeProperties(new Color(10, 0, 0), 100, 255), new FadeProperties(new Color(0, 10, 0), 100, 255), new FadeProperties(new Color(0, 0, 10), 100, 255));
             Console.ReadLine();
@@ -26,7 +28,6 @@ namespace Testing
         private static void PortalTagEvent(PortalTagEventArgs args)
         {
             Console.ForegroundColor = ConsoleColor.White;
-            Console.Write("\r");
             Console.Write(DateTime.Now.ToString("HH:mm:ss"));
             Console.Write(" - ");
 
