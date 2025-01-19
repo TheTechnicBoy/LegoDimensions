@@ -1,8 +1,10 @@
-﻿using LibUsbDotNet.LibUsb;
+﻿using LibUsbDotNet;
+using LibUsbDotNet.LibUsb;
 using LibUsbDotNet.Main;
 using System.ComponentModel;
 using System.Diagnostics.Tracing;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Security.AccessControl;
 using System.Threading;
 
@@ -10,6 +12,10 @@ namespace LegoDimensions
 {
     public class Portal
     {
+
+        [DllImport("libusb-1.0", EntryPoint = "libusb_set_auto_detach_kernel_driver")]
+        public static extern Error SetAutoDetachKernelDriver(DeviceHandle devHandle, int enable);
+
         //Constants
         internal const int ProductId = 0x0241;
         internal const int VendorId = 0x0E6F;
@@ -79,6 +85,12 @@ namespace LegoDimensions
 
             //Open the device
             _portal.Open();
+
+
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                SetAutoDetachKernelDriver(_portal.DeviceHandle, 1);
+            }
 
             //Get the first config number of the interface
             _portal.ClaimInterface(_portal.Configs[0].Interfaces[0].Number);
@@ -167,6 +179,8 @@ namespace LegoDimensions
                 _FormatedResponse.Remove(MessageID_);
                 result = true;
             }
+
+            result = true;
 
             return result;
         }
