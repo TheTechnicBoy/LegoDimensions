@@ -121,11 +121,15 @@ namespace LegoDimensions
             {
                 Task.Run(() =>
                 {
-                    SetFade(Pad.Center, new FadeProperties(new Color(50, 0, 0), 60, 1));
+                    bool time = false;
+                    SetFade(out time, Pad.Center, new FadeProperties(Color.Red, 60, 1));
+                    Console.WriteLine(time);
                     Thread.Sleep(1000);
-                    SetFade(Pad.Left, new FadeProperties(new Color(0, 50, 0), 60, 1));
+                    SetFade(out time, Pad.Left, new FadeProperties(new Color(0, 50, 0), 60, 1));
+                    Console.WriteLine(time);
                     Thread.Sleep(1000);
-                    SetFade(Pad.Right, new FadeProperties(new Color(0, 0, 50), 60, 1));
+                    SetFade(out time, Pad.Right, new FadeProperties(new Color(0, 0, 50), 60, 1));
+                    Console.WriteLine(time);
                 });
             }
         }
