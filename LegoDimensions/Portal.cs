@@ -137,7 +137,7 @@ namespace LegoDimensions
 
             if (_startStoppAnimations)
             {
-                SetFade(Pad.All, new FadeProperties(new Color(0, 0, 0), 20, 1));
+                SetFade(Pad.All, new FadeProperties(Color.Off, 20, 1));
             }
 
             Thread.Sleep(1000);
@@ -785,6 +785,7 @@ namespace LegoDimensions
         }
         #endregion
 
+        #region ReadTag
         private void ReadThread(object? obj)
         {
             var readBuffer_ = new byte[32];
@@ -973,5 +974,6 @@ namespace LegoDimensions
                 }
             }
         }
+        #endregion
     }
 }

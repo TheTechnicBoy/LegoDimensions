@@ -73,7 +73,6 @@ namespace LegoDimensions
             this.green = green;
             this.blue = blue;
         }
-        //To DO Enum Colors
 
         public override String ToString()
         {
@@ -83,6 +82,11 @@ namespace LegoDimensions
         public static readonly Color Red = Color.fromHex("#FF0000");
         public static readonly Color Green = Color.fromHex("#00FF00");
         public static readonly Color Blue = Color.fromHex("#0000FF");
+        public static readonly Color Yellow = Color.fromHex("#FFFF00");
+        public static readonly Color Cyan = Color.fromHex("#00FFFF");
+        public static readonly Color Magenta = Color.fromHex("#FF00FF");
+        public static readonly Color White = Color.fromHex("#FFFFFF");
+        public static readonly Color Off = Color.fromHex("#000000");
 
         public static Color fromHex(String hex){
             if(hex.StartsWith("#")){
