@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace LegoDimensions
 {
@@ -62,22 +63,65 @@ namespace LegoDimensions
 
     public class Color
     {
-        public byte Red { get; private set; }
-        public byte Green { get; private set; }
-        public byte Blue { get; private set; }
+        public byte red { get; private set; }
+        public byte green { get; private set; }
+        public byte blue { get; private set; }
 
         public Color(byte red, byte green, byte blue)
         {
-            Red = red;
-            Green = green;
-            Blue = blue;
+            this.red = red;
+            this.green = green;
+            this.blue = blue;
         }
         //To DO Enum Colors
 
-        public String toString()
+        public override String ToString()
         {
-            return "Red: " + Red + " Green: " + Green + " Blue: " + Blue;
+            return "Red: " + red + " Green: " + green + " Blue: " + blue;
         }
+
+        public static readonly Color Red = Color.fromHex("#FF0000");
+        public static readonly Color Green = Color.fromHex("#00FF00");
+        public static readonly Color Blue = Color.fromHex("#0000FF");
+
+        public static Color fromHex(String hex){
+            if(hex.StartsWith("#")){
+                hex = hex.Substring(1);
+            }
+            if(hex.Length != 6){
+                throw new System.ArgumentException("Hex color must be 6 characters long", "hex");
+            }
+            byte r = Convert.ToByte(hex.Substring(0, 2), 16);
+            byte g = Convert.ToByte(hex.Substring(2, 4), 16);
+            byte b = Convert.ToByte(hex.Substring(4, 6), 16);
+            return new Color(r, g, b);
+        }
+
+        public static Color FromConsoleColor(ConsoleColor consoleColor)
+        {
+            switch (consoleColor)
+            {
+                case ConsoleColor.Black: return new Color(0, 0, 0);
+                case ConsoleColor.DarkBlue: return new Color(0, 0, 139);
+                case ConsoleColor.DarkGreen: return new Color(0, 100, 0);
+                case ConsoleColor.DarkCyan: return new Color(0, 139, 139);
+                case ConsoleColor.DarkRed: return new Color(139, 0, 0);
+                case ConsoleColor.DarkMagenta: return new Color(139, 0, 139);
+                case ConsoleColor.DarkYellow: return new Color(139, 139, 0);
+                case ConsoleColor.Gray: return new Color(169, 169, 169);
+                case ConsoleColor.DarkGray: return new Color(105, 105, 105);
+                case ConsoleColor.Blue: return new Color(0, 0, 255);
+                case ConsoleColor.Green: return new Color(0, 255, 0);
+                case ConsoleColor.Cyan: return new Color(0, 255, 255);
+                case ConsoleColor.Red: return new Color(255, 0, 0);
+                case ConsoleColor.Magenta: return new Color(255, 0, 255);
+                case ConsoleColor.Yellow: return new Color(255, 255, 0);
+                case ConsoleColor.White: return new Color(255, 255, 255);
+                default: throw new ArgumentOutOfRangeException(nameof(consoleColor), consoleColor, null);
+            }
+        }
+
+        
     }
 
     internal enum MessageCommand

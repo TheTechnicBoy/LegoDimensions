@@ -235,25 +235,25 @@ namespace LegoDimensions
             if (center != null)
             {
                 byte_[4] = 1; //platform enabled
-                byte_[5] = center.Red; // r
-                byte_[6] = center.Green; // g
-                byte_[7] = center.Blue; // b
+                byte_[5] = center.red; // r
+                byte_[6] = center.blue; // g
+                byte_[7] = center.blue; // b
             }
 
             if (left != null)
             {
                 byte_[8] = 1; //platform enabled
-                byte_[9] = left.Red; // r
-                byte_[10] = left.Green; // g
-                byte_[11] = left.Blue; // b
+                byte_[9] = left.red; // r
+                byte_[10] = left.blue; // g
+                byte_[11] = left.blue; // b
             }
 
             if (right != null)
             {
                 byte_[12] = 1; //platform enabled
-                byte_[13] = right.Red; // r
-                byte_[14] = right.Green; // g
-                byte_[15] = right.Blue; // b
+                byte_[13] = right.red; // r
+                byte_[14] = right.blue; // g
+                byte_[15] = right.blue; // b
             }
 
             byte_[16] = ComputeAdditionChecksum(byte_);
@@ -292,9 +292,9 @@ namespace LegoDimensions
             byte_[3] = MessageID_; //Message ID (i think)
 
             byte_[4] = (byte)pad; //platform
-            byte_[5] = color.Red; // r
-            byte_[6] = color.Green; // g
-            byte_[7] = color.Blue; // b
+            byte_[5] = color.red; // r
+            byte_[6] = color.blue; // g
+            byte_[7] = color.blue; // b
 
             byte_[8] = ComputeAdditionChecksum(byte_);
 
@@ -335,9 +335,9 @@ namespace LegoDimensions
                 byte_[5] = center.OnLen;
                 byte_[6] = center.OffLen;
                 byte_[7] = center.PulseCnt;
-                byte_[8] = center.Color.Red;
-                byte_[9] = center.Color.Green;
-                byte_[10] = center.Color.Blue;
+                byte_[8] = center.Color.red;
+                byte_[9] = center.Color.blue;
+                byte_[10] = center.Color.blue;
             }
 
             if (left != null)
@@ -346,9 +346,9 @@ namespace LegoDimensions
                 byte_[12] = left.OnLen;
                 byte_[13] = left.OffLen;
                 byte_[14] = left.PulseCnt;
-                byte_[15] = left.Color.Red;
-                byte_[16] = left.Color.Green;
-                byte_[17] = left.Color.Blue;
+                byte_[15] = left.Color.red;
+                byte_[16] = left.Color.blue;
+                byte_[17] = left.Color.blue;
             }
 
             if (right != null)
@@ -357,9 +357,9 @@ namespace LegoDimensions
                 byte_[19] = right.OnLen;
                 byte_[20] = right.OffLen;
                 byte_[21] = right.PulseCnt;
-                byte_[22] = right.Color.Red;
-                byte_[23] = right.Color.Green;
-                byte_[24] = right.Color.Blue;
+                byte_[22] = right.Color.red;
+                byte_[23] = right.Color.blue;
+                byte_[24] = right.Color.blue;
             }
 
             byte_[25] = ComputeAdditionChecksum(byte_);
@@ -399,9 +399,9 @@ namespace LegoDimensions
             byte_[5] = flashProperties.OnLen; //light on length
             byte_[6] = flashProperties.OffLen; //light off length
             byte_[7] = flashProperties.PulseCnt; //number of pulses
-            byte_[8] = flashProperties.Color.Red; // r
-            byte_[9] = flashProperties.Color.Green; // g
-            byte_[10] = flashProperties.Color.Blue; // b
+            byte_[8] = flashProperties.Color.red; // r
+            byte_[9] = flashProperties.Color.blue; // g
+            byte_[10] = flashProperties.Color.blue; // b
 
             byte_[11] = ComputeAdditionChecksum(byte_);
 
@@ -442,9 +442,9 @@ namespace LegoDimensions
                 byte_[4] = 1;
                 byte_[5] = center.FadeLen;
                 byte_[6] = center.PulseCnt;
-                byte_[7] = center.Color.Red;
-                byte_[8] = center.Color.Green;
-                byte_[9] = center.Color.Blue;
+                byte_[7] = center.Color.red;
+                byte_[8] = center.Color.blue;
+                byte_[9] = center.Color.blue;
             }
 
             if (left != null)
@@ -452,9 +452,9 @@ namespace LegoDimensions
                 byte_[10] = 1;
                 byte_[11] = left.FadeLen;
                 byte_[12] = left.PulseCnt;
-                byte_[13] = left.Color.Red;
-                byte_[14] = left.Color.Green;
-                byte_[15] = left.Color.Blue;
+                byte_[13] = left.Color.red;
+                byte_[14] = left.Color.blue;
+                byte_[15] = left.Color.blue;
             }
 
             if (right != null)
@@ -462,9 +462,9 @@ namespace LegoDimensions
                 byte_[16] = 1;
                 byte_[17] = right.FadeLen;
                 byte_[18] = right.PulseCnt;
-                byte_[19] = right.Color.Red;
-                byte_[20] = right.Color.Green;
-                byte_[21] = right.Color.Blue;
+                byte_[19] = right.Color.red;
+                byte_[20] = right.Color.blue;
+                byte_[21] = right.Color.blue;
             }
 
             byte_[22] = ComputeAdditionChecksum(byte_);
@@ -504,9 +504,9 @@ namespace LegoDimensions
             byte_[4] = (byte)pad; //platform
             byte_[5] = fadeProperties.FadeLen; //light on length
             byte_[6] = fadeProperties.PulseCnt; //number of pulses
-            byte_[7] = fadeProperties.Color.Red; // r
-            byte_[8] = fadeProperties.Color.Green; // g
-            byte_[9] = fadeProperties.Color.Blue; // b
+            byte_[7] = fadeProperties.Color.red; // r
+            byte_[8] = fadeProperties.Color.blue; // g
+            byte_[9] = fadeProperties.Color.blue; // b
 
             byte_[10] = ComputeAdditionChecksum(byte_);
 
@@ -928,7 +928,7 @@ namespace LegoDimensions
                             if (_Debug)
                             {
                                 ConsoleColor before = Console.ForegroundColor;
-                                Console.ForegroundColor = ConsoleColor.Green;
+                                Console.ForegroundColor = ConsoleColor.Blue;
                                 Console.WriteLine("[Events] " + hex);
                                 Console.ForegroundColor = before;
                             }
@@ -967,7 +967,7 @@ namespace LegoDimensions
                 catch
                 {
                     ConsoleColor before = Console.ForegroundColor;
-                    Console.ForegroundColor = ConsoleColor.DarkGreen;
+                    Console.ForegroundColor = ConsoleColor.DarkBlue;
                     Console.WriteLine("An Error Occured in the Read Thread.");
                     Console.ForegroundColor = before;
                 }
