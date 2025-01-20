@@ -6,4 +6,7 @@ Building:
 dotnet build
 
 Linux libusb
-sudo apt-get libusb-dev
+sudo apt-get install libusb-dev
+sudo apt-get install donet-sdk-8.0
+sudo pacman -S libusb
+sudo pacman -S dotnet-sdk-8.0

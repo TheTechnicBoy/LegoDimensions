@@ -30,7 +30,7 @@ namespace LegoDimensions
         internal CancellationTokenSource _cancelThread;
 
         //Variables
-        internal bool _Debug = true;
+        internal bool _Debug = false;
         internal bool _startStoppAnimations;
         internal byte _messageID;
         internal Dictionary<int, MessageCommand> _CommandDictionary;
@@ -186,8 +186,6 @@ namespace LegoDimensions
                 _FormatedResponse.Remove(MessageID_);
                 result = true;
             }
-
-            result = true;
 
             return result;
         }
@@ -816,7 +814,11 @@ namespace LegoDimensions
                         Console.ForegroundColor = before;
                     }
 
-                    if (bytesRead_ == 33)
+                    //Win has 33
+                    //Linux has 32
+                    //Why?
+                    //I don't know
+                    if (bytesRead_ == 33 || bytesRead_ == 32)
                     {
                         //I guess callback/Confirmation from commands send to portal
                         if (readBuffer_[0] == 0x55)
