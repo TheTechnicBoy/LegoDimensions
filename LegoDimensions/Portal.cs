@@ -121,15 +121,11 @@ namespace LegoDimensions
             {
                 Task.Run(() =>
                 {
-                    bool time = false;
-                    SetFade(out time, Pad.Center, new FadeProperties(Color.Red, 60, 1));
-                    Console.WriteLine(time);
+                    SetFade(Pad.Center, new FadeProperties(Color.Red, 60, 1));
                     Thread.Sleep(1000);
-                    SetFade(out time, Pad.Left, new FadeProperties(new Color(0, 50, 0), 60, 1));
-                    Console.WriteLine(time);
+                    SetFade(Pad.Left, new FadeProperties(Color.Green, 60, 1));
                     Thread.Sleep(1000);
-                    SetFade(out time, Pad.Right, new FadeProperties(new Color(0, 0, 50), 60, 1));
-                    Console.WriteLine(time);
+                    SetFade(Pad.Right, new FadeProperties(Color.Blue, 60, 1));
                 });
             }
         }
@@ -240,7 +236,7 @@ namespace LegoDimensions
             {
                 byte_[4] = 1; //platform enabled
                 byte_[5] = center.red; // r
-                byte_[6] = center.blue; // g
+                byte_[6] = center.green; // g
                 byte_[7] = center.blue; // b
             }
 
@@ -256,7 +252,7 @@ namespace LegoDimensions
             {
                 byte_[12] = 1; //platform enabled
                 byte_[13] = right.red; // r
-                byte_[14] = right.blue; // g
+                byte_[14] = right.green; // g
                 byte_[15] = right.blue; // b
             }
 
@@ -297,7 +293,7 @@ namespace LegoDimensions
 
             byte_[4] = (byte)pad; //platform
             byte_[5] = color.red; // r
-            byte_[6] = color.blue; // g
+            byte_[6] = color.green; // g
             byte_[7] = color.blue; // b
 
             byte_[8] = ComputeAdditionChecksum(byte_);
@@ -340,7 +336,7 @@ namespace LegoDimensions
                 byte_[6] = center.OffLen;
                 byte_[7] = center.PulseCnt;
                 byte_[8] = center.Color.red;
-                byte_[9] = center.Color.blue;
+                byte_[9] = center.Color.green;
                 byte_[10] = center.Color.blue;
             }
 
@@ -351,7 +347,7 @@ namespace LegoDimensions
                 byte_[13] = left.OffLen;
                 byte_[14] = left.PulseCnt;
                 byte_[15] = left.Color.red;
-                byte_[16] = left.Color.blue;
+                byte_[16] = left.Color.green;
                 byte_[17] = left.Color.blue;
             }
 
@@ -362,7 +358,7 @@ namespace LegoDimensions
                 byte_[20] = right.OffLen;
                 byte_[21] = right.PulseCnt;
                 byte_[22] = right.Color.red;
-                byte_[23] = right.Color.blue;
+                byte_[23] = right.Color.green;
                 byte_[24] = right.Color.blue;
             }
 
@@ -404,7 +400,7 @@ namespace LegoDimensions
             byte_[6] = flashProperties.OffLen; //light off length
             byte_[7] = flashProperties.PulseCnt; //number of pulses
             byte_[8] = flashProperties.Color.red; // r
-            byte_[9] = flashProperties.Color.blue; // g
+            byte_[9] = flashProperties.Color.green; // g
             byte_[10] = flashProperties.Color.blue; // b
 
             byte_[11] = ComputeAdditionChecksum(byte_);
@@ -447,7 +443,7 @@ namespace LegoDimensions
                 byte_[5] = center.FadeLen;
                 byte_[6] = center.PulseCnt;
                 byte_[7] = center.Color.red;
-                byte_[8] = center.Color.blue;
+                byte_[8] = center.Color.green;
                 byte_[9] = center.Color.blue;
             }
 
@@ -457,7 +453,7 @@ namespace LegoDimensions
                 byte_[11] = left.FadeLen;
                 byte_[12] = left.PulseCnt;
                 byte_[13] = left.Color.red;
-                byte_[14] = left.Color.blue;
+                byte_[14] = left.Color.green;
                 byte_[15] = left.Color.blue;
             }
 
@@ -467,7 +463,7 @@ namespace LegoDimensions
                 byte_[17] = right.FadeLen;
                 byte_[18] = right.PulseCnt;
                 byte_[19] = right.Color.red;
-                byte_[20] = right.Color.blue;
+                byte_[20] = right.Color.green;
                 byte_[21] = right.Color.blue;
             }
 
@@ -509,7 +505,7 @@ namespace LegoDimensions
             byte_[5] = fadeProperties.FadeLen; //light on length
             byte_[6] = fadeProperties.PulseCnt; //number of pulses
             byte_[7] = fadeProperties.Color.red; // r
-            byte_[8] = fadeProperties.Color.blue; // g
+            byte_[8] = fadeProperties.Color.green; // g
             byte_[9] = fadeProperties.Color.blue; // b
 
             byte_[10] = ComputeAdditionChecksum(byte_);

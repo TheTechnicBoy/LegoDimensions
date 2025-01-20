@@ -17,7 +17,7 @@ namespace Testing
             Thread.Sleep(3000);
             portal.SetColor(Pad.Right, new Color(150, 50, 0));
             portal.SetColor(Pad.Left, new Color(2, 136, 214));
-            portal.SetColor(Pad.Center, new Color(0,0,0));
+            portal.SetColor(Pad.Center, Color.White);
             //Thread.Sleep(3000);
             //portal.SetFades(new FadeProperties(new Color(10, 0, 0), 100, 255), new FadeProperties(new Color(0, 10, 0), 100, 255), new FadeProperties(new Color(0, 0, 10), 100, 255));
             Console.ReadLine();

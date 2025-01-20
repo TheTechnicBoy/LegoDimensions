@@ -89,11 +89,9 @@ namespace LegoDimensions
         public static readonly Color Off = Color.fromHex("#000000");
 
         public static Color fromHex(String hex){
-            Console.WriteLine(hex);
             if(hex.StartsWith("#")){
                 hex = hex.Substring(1);
             }
-            Console.WriteLine(hex);
             if(hex.Length != 6){
                 throw new System.ArgumentException("Hex color must be 6 characters long", "hex");
             }
