@@ -15,7 +15,7 @@ namespace Testing
             portal.PortalTagEvent += PortalTagEvent;
             portal.nfcEnabled = true;
             Thread.Sleep(3000);
-            portal.SetColor(Pad.Right, new Color(214, 108, 2));
+            portal.SetColor(Pad.Right, new Color(150, 50, 0));
             portal.SetColor(Pad.Left, new Color(2, 136, 214));
             portal.SetColor(Pad.Center, new Color(0,0,0));
             //Thread.Sleep(3000);
