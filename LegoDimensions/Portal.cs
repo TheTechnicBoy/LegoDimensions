@@ -37,6 +37,7 @@ namespace LegoDimensions
         internal Dictionary<int, object> _FormatedResponse;
         public Dictionary<int, byte[]> presentTags;
         private bool _nfcEnabled = true;
+        public bool isAlive = false;
         public bool nfcEnabled {
             get => _nfcEnabled;
             set
@@ -111,6 +112,8 @@ namespace LegoDimensions
             //Activate
             if (!WakeUp()) throw new Exception("Could Not Wake up Portal");
 
+            isAlive = true;
+
             //Animation
             if (_startStoppAnimations)
             {
@@ -126,6 +129,8 @@ namespace LegoDimensions
         }
         public void Close()
         {
+            isAlive = false;
+            
             _cancelThread.Cancel();
 
             if (_startStoppAnimations)
