@@ -30,7 +30,7 @@ namespace LegoDimensions
         internal CancellationTokenSource _cancelThread;
 
         //Variables
-        internal bool _Debug = false;
+        internal bool _Debug = true;
         internal bool _startStoppAnimations;
         internal byte _messageID;
         internal Dictionary<int, MessageCommand> _CommandDictionary;
@@ -799,20 +799,22 @@ namespace LegoDimensions
                 {
                     _endpointReader.Read(readBuffer_, ReadWriteTimeout, out bytesRead_);
 
-                    if (_Debug)
-                    {
-                        ConsoleColor before = Console.ForegroundColor;
-                        Console.ForegroundColor = ConsoleColor.DarkGray;
-                        Console.WriteLine("Bytes Read: " + bytesRead_);
-                        Console.ForegroundColor = before;
-                    }
-
                     if (bytesRead_ <= 0)
                     {
                         continue;
                     }
 
                     string hex = BitConverter.ToString(readBuffer_);
+
+                    if (_Debug)
+                    {
+                        ConsoleColor before = Console.ForegroundColor;
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine("Bytes Read: " + bytesRead_);
+                        Console.WriteLine(hex);
+                        Console.WriteLine("\n");
+                        Console.ForegroundColor = before;
+                    }
 
                     if (bytesRead_ == 33)
                     {
