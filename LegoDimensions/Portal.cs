@@ -38,20 +38,22 @@ namespace LegoDimensions
         public Dictionary<int, byte[]> presentTags;
         private bool _nfcEnabled = true;
         public bool isAlive = false;
-        public bool nfcEnabled {
+        public bool nfcEnabled
+        {
             get => _nfcEnabled;
             set
             {
-                if(value == _nfcEnabled) return;
+                if (value == _nfcEnabled) return;
                 bool timeout;
                 setNFCEnabled(out timeout, value);
-                if(timeout) {
+                if (timeout)
+                {
                     ConsoleColor before = Console.ForegroundColor;
                     Console.ForegroundColor = ConsoleColor.DarkRed;
                     Console.WriteLine("Timeout while setting NFCEnabled");
                     Console.ForegroundColor = before;
                 }
-                if(!timeout) _nfcEnabled = value;
+                if (!timeout) _nfcEnabled = value;
             }
         }
 
@@ -130,7 +132,7 @@ namespace LegoDimensions
         public void Close()
         {
             isAlive = false;
-            
+
             _cancelThread.Cancel();
 
             if (_startStoppAnimations)
@@ -751,12 +753,13 @@ namespace LegoDimensions
             SetTagPassword(out _, password, index, newPassword);
         }
 
-        private void setNFCEnabled(out bool timeout, bool enabled){
+        private void setNFCEnabled(out bool timeout, bool enabled)
+        {
             //Only a Payload from 1 -> true/false
 
             var waitHandle = new ManualResetEvent(false);
 
-             byte[] byte_ = new byte[32];
+            byte[] byte_ = new byte[32];
             var MessageID_ = _messageID++;
 
             byte_[0] = 0x55; //start
@@ -795,6 +798,14 @@ namespace LegoDimensions
                 try
                 {
                     _endpointReader.Read(readBuffer_, ReadWriteTimeout, out bytesRead_);
+
+                    if (_Debug)
+                    {
+                        ConsoleColor before = Console.ForegroundColor;
+                        Console.ForegroundColor = ConsoleColor.DarkGray;
+                        Console.WriteLine("Bytes Read: " + bytesRead_);
+                        Console.ForegroundColor = before;
+                    }
 
                     if (bytesRead_ <= 0)
                     {
@@ -886,12 +897,12 @@ namespace LegoDimensions
                                 var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
                                 waitHandle.Set();
                             }
-                            else if(MessageCommand == MessageCommand.FadeRandom)
+                            else if (MessageCommand == MessageCommand.FadeRandom)
                             {
                                 var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
                                 waitHandle.Set();
                             }
-                            else if(MessageCommand == MessageCommand.ConfigActive)
+                            else if (MessageCommand == MessageCommand.ConfigActive)
                             {
                                 var waitHandle = (ManualResetEvent)_FormatedResponse[ID];
                                 waitHandle.Set();
