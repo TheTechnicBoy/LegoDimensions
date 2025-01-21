@@ -214,7 +214,7 @@ namespace LegoDimensions
         #endregion
 
 
-        #region Colors
+        #region SetColor
         public async Task<bool> SetColorsAsync(Color? center = null, Color? left = null, Color? right = null)
         {
             var waitHandle = new ManualResetEvent(false);
@@ -267,8 +267,6 @@ namespace LegoDimensions
         {
             SetColorsAsync(center, left, right).Wait();
         }
-
-
         public async Task<bool> SetColorAsync(Pad pad, Color color)
         {
             var waitHandle = new ManualResetEvent(false);
@@ -301,7 +299,9 @@ namespace LegoDimensions
         {
             SetColorAsync(pad, color).Wait();
         }
+        #endregion
 
+        #region SetFlash
         public async Task<bool> SetFlashsAsync(FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
         {
             var waitHandle = new ManualResetEvent(false);
@@ -400,8 +400,9 @@ namespace LegoDimensions
         {
             SetFlashAsync(pad, flashProperties).Wait();
         }
+        #endregion
 
-
+        #region SetFade
         public async Task<bool> SetFadesAsync(FadeProperties? center = null, FadeProperties? left = null, FadeProperties? right = null)
         {
             var waitHandle = new ManualResetEvent(false);
@@ -532,8 +533,7 @@ namespace LegoDimensions
         }
         #endregion
 
-        #region Tag
-
+        #region TagActions
         public byte[] ReadTag(out bool timeout, byte index, byte page)
         {
             var result = _ReadTag(out timeout, index, page);
@@ -748,8 +748,8 @@ namespace LegoDimensions
         }
         #endregion
 
-        #region ReadTag
-        private void ReadThread(object? obj)
+        #region ReadThread
+        private void ReadThread()
         {
             var readBuffer_ = new byte[32];
             int bytesRead_;
@@ -782,7 +782,7 @@ namespace LegoDimensions
                     //Linux has 32
                     //Why?
                     //I don't know
-                    if (bytesRead_ == 33 || bytesRead_ == 32)
+                    if ((bytesRead_ == 33 && RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ) || (bytesRead_ == 32 && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ) )
                     {
                         //I guess callback/Confirmation from commands send to portal
                         if (readBuffer_[0] == 0x55)
