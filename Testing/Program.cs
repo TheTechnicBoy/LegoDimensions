@@ -1,7 +1,5 @@
 ﻿
 using LegoDimensions;
-using System;
-using System.Net.Http.Headers;
 
 namespace Testing
 {
@@ -9,20 +7,21 @@ namespace Testing
     {
         public static Portal portal = new Portal(true);
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             if (portal == null) return;
             portal.PortalTagEvent += PortalTagEvent;
             portal.nfcEnabled = true;
-            Thread.Sleep(3000);
-            portal.SetColor(Pad.Right, new Color(150, 50, 0));
-            portal.SetColor(Pad.Left, new Color(2, 136, 214));
-            portal.SetColor(Pad.Center, Color.White);
-            //Thread.Sleep(3000);
-            //portal.SetFades(new FadeProperties(new Color(10, 0, 0), 100, 255), new FadeProperties(new Color(0, 10, 0), 100, 255), new FadeProperties(new Color(0, 0, 10), 100, 255));
+
+            await Task.Delay(3000);
+
+            portal.SetFades(new FadeProperties(Color.Off, 10, 1), new FadeProperties(new Color(150, 50, 0), 10, 1), new FadeProperties(new Color(2, 136, 214), 10, 1) );
+
             Console.ReadLine();
 
             portal.Close();
+
+            return;
         }
 
         private static void PortalTagEvent(PortalTagEventArgs args)

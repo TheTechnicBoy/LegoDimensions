@@ -1,7 +1,4 @@
-﻿using System.Collections.ObjectModel;
-using System.ComponentModel;
-
-namespace LegoDimensions
+﻿namespace LegoDimensions
 {
     public enum Pad
     {

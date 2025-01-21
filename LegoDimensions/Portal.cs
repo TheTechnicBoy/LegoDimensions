@@ -1,12 +1,7 @@
 ﻿using LibUsbDotNet;
 using LibUsbDotNet.LibUsb;
 using LibUsbDotNet.Main;
-using System.ComponentModel;
-using System.Diagnostics.Tracing;
-using System.Reflection;
 using System.Runtime.InteropServices;
-using System.Security.AccessControl;
-using System.Threading;
 
 namespace LegoDimensions
 {
@@ -220,7 +215,7 @@ namespace LegoDimensions
 
 
         #region Colors
-        public void SetColors(out bool timeout, Color? center = null, Color? left = null, Color? right = null)
+        public async Task<bool> SetColorsAsync(Color? center = null, Color? left = null, Color? right = null)
         {
             var waitHandle = new ManualResetEvent(false);
 
@@ -262,27 +257,21 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                _FormatedResponse.Remove(MessageID_);
-                timeout = false;
-            }
-            else
-            {
-                timeout = true;
-            }
+            var timeout = !await Task.Run(() => waitHandle.WaitOne(ReceiveTimeout, false));
+
+            _FormatedResponse.Remove(MessageID_);
+
+            return timeout;
         }
         public void SetColors(Color? center = null, Color? left = null, Color? right = null)
         {
-            SetColors(out _, center, left, right);
+            SetColorsAsync(center, left, right).Wait();
         }
 
-        public void SetColor(out bool timeout, Pad pad, Color color)
+
+        public async Task<bool> SetColorAsync(Pad pad, Color color)
         {
             var waitHandle = new ManualResetEvent(false);
-
-            if (color == null) throw new ArgumentNullException(nameof(color));
-
             var MessageID_ = _messageID++;
             byte[] byte_ = new byte[32];
 
@@ -302,22 +291,18 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                _FormatedResponse.Remove(MessageID_);
-                timeout = false;
-            }
-            else
-            {
-                timeout = true;
-            }
+            var timeout = !await Task.Run(() => waitHandle.WaitOne(ReceiveTimeout, false));
+
+            _FormatedResponse.Remove(MessageID_);
+
+            return timeout;
         }
         public void SetColor(Pad pad, Color color)
         {
-            SetColor(out _, pad, color);
+            SetColorAsync(pad, color).Wait();
         }
 
-        public void SetFlashs(out bool timeout, FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
+        public async Task<bool> SetFlashsAsync(FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
         {
             var waitHandle = new ManualResetEvent(false);
 
@@ -368,22 +353,18 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                _FormatedResponse.Remove(MessageID_);
-                timeout = false;
-            }
-            else
-            {
-                timeout = true;
-            }
+            var timeout = !await Task.Run(() => waitHandle.WaitOne(ReceiveTimeout, false));
+
+            _FormatedResponse.Remove(MessageID_);
+
+            return timeout;
         }
         public void SetFlashs(FlashProperties? center = null, FlashProperties? left = null, FlashProperties? right = null)
         {
-            SetFlashs(out _, center, left, right);
+            SetFlashsAsync(center, left, right).Wait();
         }
 
-        public void SetFlash(out bool timeout, Pad pad, FlashProperties flashProperties)
+        public async Task<bool> SetFlashAsync(Pad pad, FlashProperties flashProperties)
         {
             var waitHandle = new ManualResetEvent(false);
 
@@ -409,23 +390,19 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                _FormatedResponse.Remove(MessageID_);
-                timeout = false;
-            }
-            else
-            {
-                timeout = true;
-            }
+            var timeout = !await Task.Run(() => waitHandle.WaitOne(ReceiveTimeout, false));
+
+            _FormatedResponse.Remove(MessageID_);
+
+            return timeout;
         }
         public void SetFlash(Pad pad, FlashProperties flashProperties)
         {
-            SetFlash(out _, pad, flashProperties);
+            SetFlashAsync(pad, flashProperties).Wait();
         }
 
 
-        public void SetFades(out bool timeout, FadeProperties? center = null, FadeProperties? left = null, FadeProperties? right = null)
+        public async Task<bool> SetFadesAsync(FadeProperties? center = null, FadeProperties? left = null, FadeProperties? right = null)
         {
             var waitHandle = new ManualResetEvent(false);
 
@@ -473,23 +450,19 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                _FormatedResponse.Remove(MessageID_);
-                timeout = false;
-            }
-            else
-            {
-                timeout = true;
-            }
+            var timeout = !await Task.Run(() => waitHandle.WaitOne(ReceiveTimeout, false));
+
+            _FormatedResponse.Remove(MessageID_);
+
+            return timeout;
         }
 
         public void SetFades(FadeProperties? center = null, FadeProperties? left = null, FadeProperties? right = null)
         {
-            SetFades(out _, center, left, right);
+            SetFadesAsync(center, left, right).Wait();
         }
 
-        public void SetFade(out bool timeout, Pad pad, FadeProperties fadeProperties)
+        public async Task<bool> SetFadeAsync(Pad pad, FadeProperties fadeProperties)
         {
             var waitHandle = new ManualResetEvent(false);
 
@@ -514,22 +487,18 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                _FormatedResponse.Remove(MessageID_);
-                timeout = false;
-            }
-            else
-            {
-                timeout = true;
-            }
+            var timeout = !await Task.Run(() => waitHandle.WaitOne(ReceiveTimeout, false));
+
+            _FormatedResponse.Remove(MessageID_);
+
+            return timeout;
         }
         public void SetFade(Pad pad, FadeProperties fadeProperties)
         {
-            SetFade(out _, pad, fadeProperties);
+            SetFadeAsync(pad, fadeProperties).Wait();
         }
 
-        public void FadeRandom(out bool timeout, Pad pad, RandomFadeProperties randomFadeProperties)
+        public async Task<bool> FadeRandomAsync(Pad pad, RandomFadeProperties randomFadeProperties)
         {
             var waitHandle = new ManualResetEvent(false);
 
@@ -551,19 +520,15 @@ namespace LegoDimensions
 
             SendMessage(byte_);
 
-            if (waitHandle.WaitOne(ReceiveTimeout, false))
-            {
-                _FormatedResponse.Remove(MessageID_);
-                timeout = false;
-            }
-            else
-            {
-                timeout = true;
-            }
+            var timeout = !await Task.Run(() => waitHandle.WaitOne(ReceiveTimeout, false));
+
+            _FormatedResponse.Remove(MessageID_);
+
+            return timeout;
         }
         public void FadeRandom(Pad pad, RandomFadeProperties randomFadeProperties)
         {
-            FadeRandom(out _, pad, randomFadeProperties);
+            FadeRandomAsync(pad, randomFadeProperties).Wait();
         }
         #endregion
 
@@ -753,8 +718,6 @@ namespace LegoDimensions
 
         private void setNFCEnabled(out bool timeout, bool enabled)
         {
-            //Only a Payload from 1 -> true/false
-
             var waitHandle = new ManualResetEvent(false);
 
             byte[] byte_ = new byte[32];
