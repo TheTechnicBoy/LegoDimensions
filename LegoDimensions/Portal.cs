@@ -196,8 +196,13 @@ namespace LegoDimensions
         internal int SendMessage(byte[] message)
         {
             _CommandDictionary.Add(message[3], (MessageCommand)message[2]);
-            _endpointWriter.Write(message, ReadWriteTimeout, out int _numBytes);
+            USBOutput(message, ReadWriteTimeout, out int _numBytes);
             return _numBytes;
+        }
+
+        private void USBOutput(byte[] buffer, int timeout, out int transferLength)
+        {
+            _endpointWriter.Write(buffer, timeout, out transferLength);
         }
         internal IUsbDevice GetPortal()
         {
@@ -603,7 +608,7 @@ namespace LegoDimensions
                 if (tag == null || tag.Length == 0)
                 {
                     Console.WriteLine($"Error reading card page 0x{i:X2}");
-                    throw new Exception("Error reading card page 0x" + i.ToString("X2"));
+                    break;
                 }
                 else result.Add(tag);
             }
@@ -749,6 +754,11 @@ namespace LegoDimensions
         #endregion
 
         #region ReadThread
+
+        private void USBInput(byte[] buffer, int tinemout, out int bytesRead)
+        {
+            _endpointReader.Read(buffer, ReadWriteTimeout, out bytesRead);
+        }
         private void ReadThread()
         {
             var readBuffer_ = new byte[32];
@@ -759,7 +769,7 @@ namespace LegoDimensions
             {
                 try
                 {
-                    _endpointReader.Read(readBuffer_, ReadWriteTimeout, out bytesRead_);
+                    USBInput(readBuffer_, ReadWriteTimeout, out bytesRead_);
 
                     if (bytesRead_ <= 0)
                     {
@@ -900,8 +910,6 @@ namespace LegoDimensions
                             //I guess Tag/Chip Event
                             if (readBuffer_[1] == 0x0b)
                             {
-                                if (readBuffer_[2] >= 4 || readBuffer_[5] >= 2) throw new NotImplementedException(hex);
-
                                 var Checksum = readBuffer_[13];
                                 var Pad = (Pad)readBuffer_[2];
                                 var ID = (int)readBuffer_[4];

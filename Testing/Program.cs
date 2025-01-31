@@ -13,10 +13,11 @@ namespace Testing
             portal.PortalTagEvent += PortalTagEvent;
             portal.nfcEnabled = true;
 
-            await Task.Delay(3000);
+            await Task.Delay(5000);
 
-            portal.SetFades(new FadeProperties(Color.Off, 10, 1), new FadeProperties(new Color(150, 50, 0), 10, 1), new FadeProperties(new Color(2, 136, 214), 10, 1) );
-
+            portal.SetColor(Pad.Center, Color.Red);
+            portal.SetColor(Pad.Left, Color.Green);
+            portal.SetColor(Pad.Right, Color.Blue);
             Console.ReadLine();
 
             portal.Close();
