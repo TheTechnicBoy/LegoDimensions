@@ -1,38 +1,37 @@
-﻿using LibUsbDotNet;
-using LibUsbDotNet.LibUsb;
-using LibUsbDotNet.Main;
+﻿using LibUsbDotNet.LibUsb;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace LegoDimensions
 {
-    public class Portal
+    public abstract class IPortal
     {
-
-        [DllImport("libusb-1.0", EntryPoint = "libusb_set_auto_detach_kernel_driver")]
-        public static extern Error SetAutoDetachKernelDriver(DeviceHandle devHandle, int enable);
-
         //Constants
         internal const int ProductId = 0x0241;
         internal const int VendorId = 0x0E6F;
         internal const int ReadWriteTimeout = 1000;
         internal const int ReceiveTimeout = 2000;
 
-        // Class variables
-        internal IUsbDevice _portal;
-        internal UsbEndpointReader _endpointReader;
-        internal UsbEndpointWriter _endpointWriter;
+        //Class Variables
         internal Thread _readThread;
         internal CancellationTokenSource _cancelThread;
+        public Action<PortalTagEventArgs> PortalTagEvent = (args) => { };
 
-        //Variables
+        //Normal Variables
         internal bool _Debug = false;
         internal bool _startStoppAnimations;
         internal byte _messageID;
         internal Dictionary<int, MessageCommand> _CommandDictionary;
         internal Dictionary<int, object> _FormatedResponse;
+        internal bool _nfcEnabled = true;
+        internal bool isAlive = false;
         public Dictionary<int, byte[]> presentTags;
-        private bool _nfcEnabled = true;
-        public bool isAlive = false;
+
+        //Properties
         public bool nfcEnabled
         {
             get => _nfcEnabled;
@@ -52,11 +51,15 @@ namespace LegoDimensions
             }
         }
 
-        //Event
-        public Action<PortalTagEventArgs> PortalTagEvent = (args) => { };
+
+        //Overridable Functions
+        public abstract bool SetupConnection(int ProductId, int VendorId, int ReadWriteTimeout, int ReceiveTimeout);
+        public abstract bool CloseConnection();
+        public abstract void Input(byte[] buffer, int timeout, out int bytesRead);
+        public abstract void Output(byte[] buffer, int timeout, out int transferLength);
 
         #region Start/Stop
-        public Portal(bool StartStoppAnimations = true, IUsbDevice? usbDevice = null)
+        public IPortal(bool StartStoppAnimations = true)
         {
             _CommandDictionary = new Dictionary<int, MessageCommand>();
             _FormatedResponse = new Dictionary<int, object>();
@@ -64,54 +67,17 @@ namespace LegoDimensions
             _messageID = 0;
             _startStoppAnimations = StartStoppAnimations;
 
-            if (usbDevice != null)
-            {
-                if (usbDevice.ProductId == ProductId && usbDevice.VendorId == VendorId)
-                {
-                    _portal = usbDevice;
-                }
-                else
-                {
-                    throw new Exception("IUsbDevice is not a valid Lego Dimension Portal.");
-                }
-            }
-            else
-            {
-                _portal = GetPortal();
-            }
-
-
-            //Open the device
-            _portal.Open();
-
-
-            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-            {
-                SetAutoDetachKernelDriver(_portal.DeviceHandle, 1);
-            }
-
-            //Get the first config number of the interface
-            _portal.ClaimInterface(_portal.Configs[0].Interfaces[0].Number);
-
-            //Open up the endpoints
-            _endpointWriter = _portal.OpenEndpointWriter(WriteEndpointID.Ep01);
-            _endpointReader = _portal.OpenEndpointReader(ReadEndpointID.Ep01);
-
-            // Read the first 32 bytes
-            var readBuffer = new byte[32];
-            _endpointReader.Read(readBuffer, ReadWriteTimeout, out var bytesRead);
+            if(!SetupConnection(ProductId, VendorId, ReadWriteTimeout, ReceiveTimeout)) throw new Exception("Could not connect Portal");
 
             //Reader
             _cancelThread = new CancellationTokenSource();
             _readThread = new Thread(ReadThread);
             _readThread.Start();
 
-            //Activate
-            if (!WakeUp()) throw new Exception("Could Not Wake up Portal");
-
             isAlive = true;
 
-            //Animation
+            if (!WakeUp()) throw new Exception("Could Not Wake up Portal");
+
             if (_startStoppAnimations)
             {
                 Task.Run(() =>
@@ -124,6 +90,7 @@ namespace LegoDimensions
                 });
             }
         }
+
         public void Close()
         {
             isAlive = false;
@@ -137,12 +104,9 @@ namespace LegoDimensions
 
             Thread.Sleep(1000);
 
-            _portal.ReleaseInterface(_portal.Configs[0].Interfaces[0].Number);
-            _portal.Close();
-            _portal.Dispose();
+            if (!CloseConnection()) throw new Exception("Could not disconnect Portal");
         }
         #endregion
-
 
         #region Ulitiliy
         internal bool WakeUp()
@@ -196,28 +160,10 @@ namespace LegoDimensions
         internal int SendMessage(byte[] message)
         {
             _CommandDictionary.Add(message[3], (MessageCommand)message[2]);
-            USBOutput(message, ReadWriteTimeout, out int _numBytes);
+            Output(message, ReadWriteTimeout, out int _numBytes);
             return _numBytes;
         }
-
-        private void USBOutput(byte[] buffer, int timeout, out int transferLength)
-        {
-            _endpointWriter.Write(buffer, timeout, out transferLength);
-        }
-        internal IUsbDevice GetPortal()
-        {
-            var context = new UsbContext();
-            var usbdeviceCollection = context.List();
-            var selectedDevice = usbdeviceCollection.Where(d => d.ProductId == ProductId && d.VendorId == VendorId);
-            var portals = selectedDevice.ToArray();
-            if (portals.Length == 0)
-            {
-                throw new Exception("No Lego Dimensions Portal found.");
-            }
-            return portals[0];
-        }
         #endregion
-
 
         #region SetColor
         public async Task<bool> SetColorsAsync(Color? center = null, Color? left = null, Color? right = null)
@@ -754,11 +700,6 @@ namespace LegoDimensions
         #endregion
 
         #region ReadThread
-
-        private void USBInput(byte[] buffer, int tinemout, out int bytesRead)
-        {
-            _endpointReader.Read(buffer, ReadWriteTimeout, out bytesRead);
-        }
         private void ReadThread()
         {
             var readBuffer_ = new byte[32];
@@ -769,7 +710,7 @@ namespace LegoDimensions
             {
                 try
                 {
-                    USBInput(readBuffer_, ReadWriteTimeout, out bytesRead_);
+                    Input(readBuffer_, ReadWriteTimeout, out bytesRead_);
 
                     if (bytesRead_ <= 0)
                     {
@@ -792,7 +733,7 @@ namespace LegoDimensions
                     //Linux has 32
                     //Why?
                     //I don't know
-                    if ((bytesRead_ == 33 && RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ) || (bytesRead_ == 32 && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ) )
+                    if ((bytesRead_ == 33 && RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) || (bytesRead_ == 32 && !RuntimeInformation.IsOSPlatform(OSPlatform.Windows)))
                     {
                         //I guess callback/Confirmation from commands send to portal
                         if (readBuffer_[0] == 0x55)

@@ -5,7 +5,7 @@ namespace Testing
 {
     internal class Program
     {
-        public static Portal portal = new Portal(true);
+        public static USBPortal portal = new USBPortal(true);
 
         static async Task Main(string[] args)
         {
