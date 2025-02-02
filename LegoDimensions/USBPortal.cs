@@ -37,7 +37,7 @@ namespace LegoDimensions
             this.usbDevice = usbDevice;
         }
 
-        public override bool SetupConnection(int ProductId, int VendorId, int ReadWriteTimeout, int ReceiveTimeout)
+        public override bool SetupConnection(int ProductId, int VendorId, int ReadWriteTimeout)
         {
             if (usbDevice != null)
             {

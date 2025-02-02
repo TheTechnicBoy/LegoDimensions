@@ -5,10 +5,16 @@ namespace Testing
 {
     internal class Program
     {
-        public static USBPortal portal = new USBPortal(true);
+        public static IPortal portal;
 
         static async Task Main(string[] args)
         {
+            StartPortal();
+        }
+
+        public async static void StartPortal()
+        {
+            portal = new USBPortal(true);
             if (portal == null) return;
             portal.PortalTagEvent += PortalTagEvent;
             portal.nfcEnabled = true;

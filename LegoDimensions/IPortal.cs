@@ -53,7 +53,7 @@ namespace LegoDimensions
 
 
         //Overridable Functions
-        public abstract bool SetupConnection(int ProductId, int VendorId, int ReadWriteTimeout, int ReceiveTimeout);
+        public abstract bool SetupConnection(int ProductId, int VendorId, int ReadWriteTimeout);
         public abstract bool CloseConnection();
         public abstract void Input(byte[] buffer, int timeout, out int bytesRead);
         public abstract void Output(byte[] buffer, int timeout, out int transferLength);
@@ -67,7 +67,7 @@ namespace LegoDimensions
             _messageID = 0;
             _startStoppAnimations = StartStoppAnimations;
 
-            if(!SetupConnection(ProductId, VendorId, ReadWriteTimeout, ReceiveTimeout)) throw new Exception("Could not connect Portal");
+            if(!SetupConnection(ProductId, VendorId, ReadWriteTimeout)) throw new Exception("Could not connect Portal");
 
             //Reader
             _cancelThread = new CancellationTokenSource();
@@ -488,6 +488,7 @@ namespace LegoDimensions
         public byte[] ReadTag(out bool timeout, byte index, byte page)
         {
             var result = _ReadTag(out timeout, index, page);
+            if(timeout) return new byte[4];
             byte[] resultFormat = new byte[4];
             Array.Copy(result, 0, resultFormat, 0, 4);
             result = resultFormat;
