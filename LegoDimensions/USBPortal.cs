@@ -26,6 +26,7 @@ namespace LegoDimensions
             var portals = selectedDevice.ToArray();
             if (portals.Length == 0)
             {
+                Console.WriteLine("No Lego Dimensions Portal found.");
                 throw new Exception("No Lego Dimensions Portal found.");
             }
             return portals[0];
@@ -33,7 +34,6 @@ namespace LegoDimensions
 
         public USBPortal(bool StartStoppAnimations = true, IUsbDevice ? usbDevice = null) : base( StartStoppAnimations)
         {
-            
             this.usbDevice = usbDevice;
         }
 
@@ -57,22 +57,27 @@ namespace LegoDimensions
 
 
             //Open the device
+            Console.WriteLine("Opening Portal...");
             _portal.Open();
 
-
+            //Set the auto detach kernel driver
+            Console.WriteLine("Setting Auto Detach Kernel Driver...");
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 SetAutoDetachKernelDriver(_portal.DeviceHandle, 1);
             }
 
             //Get the first config number of the interface
+            Console.WriteLine("Claiming Interface...");
             _portal.ClaimInterface(_portal.Configs[0].Interfaces[0].Number);
 
             //Open up the endpoints
+            Console.WriteLine("Opening Endpoints...");
             _endpointWriter = _portal.OpenEndpointWriter(WriteEndpointID.Ep01);
             _endpointReader = _portal.OpenEndpointReader(ReadEndpointID.Ep01);
 
             // Read the first 32 bytes
+            Console.WriteLine("Reading first 32 bytes...");
             var readBuffer = new byte[32];
             _endpointReader.Read(readBuffer, ReadWriteTimeout, out var bytesRead);
 

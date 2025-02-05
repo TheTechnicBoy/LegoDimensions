@@ -16,6 +16,8 @@ namespace LegoDimensions
         internal const int ReadWriteTimeout = 1000;
         internal const int ReceiveTimeout = 2000;
 
+        private readonly object _sendMessageLock = new object();
+
         //Class Variables
         internal Thread _readThread;
         internal CancellationTokenSource _cancelThread;
@@ -67,7 +69,7 @@ namespace LegoDimensions
             _messageID = 0;
             _startStoppAnimations = StartStoppAnimations;
 
-            if(!SetupConnection(ProductId, VendorId, ReadWriteTimeout)) throw new Exception("Could not connect Portal");
+            if (!SetupConnection(ProductId, VendorId, ReadWriteTimeout)) throw new Exception("Could not connect Portal");
 
             //Reader
             _cancelThread = new CancellationTokenSource();
@@ -159,13 +161,17 @@ namespace LegoDimensions
         }
         internal int SendMessage(byte[] message)
         {
-            _CommandDictionary.Add(message[3], (MessageCommand)message[2]);
-            Output(message, ReadWriteTimeout, out int _numBytes);
-            return _numBytes;
+            lock (_sendMessageLock)
+            {
+
+                _CommandDictionary.Add(message[3], (MessageCommand)message[2]);
+                Output(message, ReadWriteTimeout, out int _numBytes);
+                return _numBytes;
+            }
         }
         #endregion
 
-        #region SetColor
+            #region SetColor
         public async Task<bool> SetColorsAsync(Color? center = null, Color? left = null, Color? right = null)
         {
             var waitHandle = new ManualResetEvent(false);
@@ -488,7 +494,7 @@ namespace LegoDimensions
         public byte[] ReadTag(out bool timeout, byte index, byte page)
         {
             var result = _ReadTag(out timeout, index, page);
-            if(timeout) return new byte[4];
+            if (timeout) return new byte[4];
             byte[] resultFormat = new byte[4];
             Array.Copy(result, 0, resultFormat, 0, 4);
             result = resultFormat;

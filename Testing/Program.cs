@@ -14,6 +14,7 @@ namespace Testing
 
         public async static void StartPortal()
         {
+            Console.WriteLine("Starting Portal...");
             portal = new USBPortal(true);
             if (portal == null) return;
             portal.PortalTagEvent += PortalTagEvent;
